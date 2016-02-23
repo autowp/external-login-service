@@ -3,8 +3,6 @@
 namespace AutowpTest\ExternalLoginService;
 
 use Autowp\ExternalLoginService\Result;
-use Autowp\ExternalLoginService\InvalidUriException;
-use Autowp\ExternalLoginService\InvalidEmailAddressException;
 
 use DateTime;
 
@@ -32,10 +30,11 @@ class ResultTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($data, $result->toArray());
     }
 
+    /**
+     * @expectedException \Autowp\ExternalLoginService\InvalidUriException
+     */
     public function testIncorrectPhotoUriThrowsException()
     {
-        $this->expectException(InvalidUriException::class);
-        
         $result = new Result(array(
             'externalId' => '123',
             'name'       => 'Ivanov Ivan',
@@ -48,10 +47,11 @@ class ResultTest extends \PHPUnit_Framework_TestCase
         ));
     }
 
+    /**
+     * @expectedException \Autowp\ExternalLoginService\InvalidEmailAddressException
+     */
     public function testIncorrectEmailThrowsException()
-    {
-        $this->expectException(InvalidEmailAddressException::class);
-    
+    {    
         $result = new Result(array(
             'externalId' => '123',
             'name'       => 'Ivanov Ivan',
