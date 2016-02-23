@@ -6,18 +6,18 @@ use Autowp\ExternalLoginService\Exception;
 use Autowp\ExternalLoginService\AbstractService;
 use Autowp\ExternalLoginService\Result;
 
-use Zend_Json;
-use Zend_Oauth;
-use Zend_Oauth_Consumer;
-use Zend_Oauth_Token_Access;
 use Zend_Session_Namespace;
-use Zend_Service_Twitter;
+
+use Zend\Json;
+use ZendOAuth\Consumer;
+use ZendOAuth\OAuth;
+use ZendOAuth\Token\Access;
+use ZendService\Twitter\Twitter as TwitterService;
 
 class Twitter extends AbstractService
 {
     /**
-     *
-     * @var Zend_Oauth_Consumer
+     * @var Consumer
      */
     protected $_consumer = null;
 
@@ -29,7 +29,7 @@ class Twitter extends AbstractService
 
     /**
      *
-     * @var Zend_Oauth_Token_Access
+     * @var Access
      */
     protected $_accessToken = null;
 
@@ -48,7 +48,7 @@ class Twitter extends AbstractService
     {
         if (!$this->_consumer) {
             $consumerOptions = array(
-                'requestScheme'   => Zend_Oauth::REQUEST_SCHEME_HEADER,
+                'requestScheme'   => OAuth::REQUEST_SCHEME_HEADER,
                 'requestTokenUrl' => 'https://api.twitter.com/oauth/request_token',
                 'accessTokenUrl'  => 'https://api.twitter.com/oauth/access_token',
                 'siteUrl'         => "http://twitter.com/oauth",
@@ -58,7 +58,7 @@ class Twitter extends AbstractService
             if (isset($this->_options['redirect_uri'])) {
                 $consumerOptions['callbackUrl'] = $this->_options['redirect_uri'];
             }
-            $this->_consumer = new Zend_Oauth_Consumer($consumerOptions);
+            $this->_consumer = new Consumer($consumerOptions);
         }
 
         return $this->_consumer;
@@ -114,9 +114,8 @@ class Twitter extends AbstractService
             return false;
         }
         $session = $this->_getSession();
-        if (! isset($this->_getSession()->requestToken)) {
-            $message = 'Request token not set';
-            throw new Exception($message);
+        if (!isset($this->_getSession()->requestToken)) {
+            throw new Exception('Request token not set');
         }
 
         $consumer = $this->getConsumer(array(
@@ -135,7 +134,7 @@ class Twitter extends AbstractService
      */
     public function getData(array $options)
     {
-        $twitter = new Zend_Service_Twitter(array(
+        $twitter = new TwitterService(array(
             'username'     => $this->_accessToken->getParam('screen_name'),
             'accessToken'  => $this->_accessToken,
             'oauthOptions' => array(
@@ -168,7 +167,7 @@ class Twitter extends AbstractService
 
     public function getFriends()
     {
-        $twitter = new Zend_Service_Twitter(array(
+        $twitter = new TwitterService(array(
             'username'     => $this->_accessToken->getParam('screen_name'),
             'accessToken'  => $this->_accessToken,
             'oauthOptions' => array(
@@ -189,7 +188,7 @@ class Twitter extends AbstractService
             $client->setEncType();
             $response = $client->request('GET');
             if ($response->isSuccessful()) {
-                $response = Zend_Json::decode($response->getBody());
+                $response = Json::decode($response->getBody());
                 foreach ($response['ids'] as &$value) {
                     $friendsId[] = (string) $value;
                 }
@@ -197,7 +196,7 @@ class Twitter extends AbstractService
                     break;
                 $cursor ++;
             }
-            if (! $response->isSuccess()) {
+            if (!$response->isSuccess()) {
                 $message = 'Error requesting data';
                 throw new Exception($message);
             }
@@ -207,7 +206,7 @@ class Twitter extends AbstractService
 
     public function setAccessToken(array $params)
     {
-        $this->_accessToken = new Zend_Oauth_Token_Access();
+        $this->_accessToken = new Access();
         $this->_accessToken->setParams($params);
         return $this;
     }

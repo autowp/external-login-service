@@ -8,7 +8,7 @@ use Autowp\ExternalLoginService\Result;
 
 use League\OAuth2\Client\Provider\Facebook as FacebookProvider;
 
-use Zend_Date;
+use DateTime;
 
 class Facebook extends LeagueOAuth2
 {
@@ -87,7 +87,7 @@ class Facebook extends LeagueOAuth2
             $data['profileUrl'] = $json['link'];
         }
         if (isset($json['birthday']) && $json['birthday']) {
-            $data['birthday'] = new Zend_Date($json['birthday'], 'MM/dd/yyyy');
+            $data['birthday'] = DateTime::createFromFormat('d/m/Y', $json['birthday']);
         }
         if (isset($json['email']) && $json['email']) {
             $data['email'] = $json['email'];

@@ -5,52 +5,51 @@ namespace Autowp\ExternalLoginService;
 use Autowp\ExternalLoginService\Exception;
 
 use DateTime;
-
-use Zend_Date;
-use Zend_Uri;
+use Zend\Validator\Uri;
+use Zend\Validator\EmailAddress;
 
 class Result
 {
     /**
      * @var string
      */
-    protected $_externalId = null;
+    private $_externalId = null;
 
     /**
      * @var string
      */
-    protected $_name = null;
+    private $_name = null;
 
     /**
      * @var string
      */
-    protected $_profileUrl = null;
+    private $_profileUrl = null;
 
     /**
      * @var string
      */
-    protected $_photoUrl = null;
+    private $_photoUrl = null;
 
     /**
-     * @var Zend_Date
+     * @var DateTime
      */
-    protected $_birthday = null;
-
-    /**
-     * @var string
-     */
-    protected $_email = null;
+    private $_birthday = null;
 
     /**
      * @var string
      */
-    protected $_residence = null;
+    private $_email = null;
+
+    /**
+     * @var string
+     */
+    private $_residence = null;
 
 
     /**
      * @var int
      */
-    protected $_gender = null;
+    private $_gender = null;
 
     /**
      * @param array $options
@@ -160,11 +159,15 @@ class Result
         $photoUrl = (string)$photoUrl;
 
         if ($photoUrl) {
-            if (Zend_Uri::check($photoUrl)) {
+            
+            $validator = new Uri([
+                'allowRelative' => false
+            ]);
+            
+            if ($validator->isValid($photoUrl)) {
                 $this->_photoUrl = $photoUrl;
             } else {
-                $message = "Invalid profile url `$photoUrl`";
-                throw new Exception($message);
+                throw new InvalidUriException("Invalid profile url `$photoUrl`");
             }
         } else {
             $this->_photoUrl = null;
@@ -187,7 +190,20 @@ class Result
      */
     public function setEmail($email)
     {
-        $this->_email = (string)$email;
+        $email = (string)$email;
+        
+        if ($email) {
+        
+            $validator = new EmailAddress();
+        
+            if ($validator->isValid($email)) {
+                $this->_email = $email;
+            } else {
+                throw new InvalidEmailAddressException("Invalid e-mail `$email`");
+            }
+        } else {
+            $this->_email = null;
+        }
 
         return $this;
     }
@@ -212,7 +228,7 @@ class Result
     }
 
     /**
-     * @return Zend_Date
+     * @return DateTime
      */
     public function getBirthday()
     {
@@ -257,9 +273,12 @@ class Result
         return $this->_gender;
     }
 
+    /**
+     * @return array
+     */
     public function toArray()
     {
-        return array(
+        return [
             'externalId' => $this->_externalId,
             'name'       => $this->_name,
             'profileUrl' => $this->_profileUrl,
@@ -268,7 +287,7 @@ class Result
             'birthday'   => $this->_birthday,
             'residence'  => $this->_residence,
             'gender'     => $this->_gender
-        );
+        ];
     }
 
     public static function fromArray(array $options)

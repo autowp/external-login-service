@@ -5,7 +5,7 @@ namespace Autowp\ExternalLoginService;
 use Autowp\ExternalLoginService\AbstractService;
 use Autowp\ExternalLoginService\Exception;
 
-use Zend_Filter_Word_DashToCamelCase;
+use Zend\Filter\Word\DashToCamelCase;
 
 class Factory
 {
@@ -31,7 +31,7 @@ class Factory
             throw new Exception("Service '$optionsKey' options not found");
         }
 
-        $filter = new Zend_Filter_Word_DashToCamelCase();
+        $filter = new DashToCamelCase();
 
         $className = 'Autowp\\ExternalLoginService\\' . ucfirst($filter->filter($service));
 
@@ -39,9 +39,7 @@ class Factory
         $serviceObj = new $className($serviceOptions);
 
         if (!$serviceObj instanceof AbstractService) {
-            throw new Exception(
-                "'$className' is not AbstractService"
-            );
+            throw new Exception("'$className' is not AbstractService");
         }
 
         return $serviceObj;
