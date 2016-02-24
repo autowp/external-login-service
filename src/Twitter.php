@@ -8,7 +8,7 @@ use Autowp\ExternalLoginService\Result;
 
 use Zend_Session_Namespace;
 
-use Zend\Json;
+use Zend\Http;
 use ZendOAuth\Consumer;
 use ZendOAuth\OAuth;
 use ZendOAuth\Token\Access;
@@ -135,6 +135,9 @@ class Twitter extends AbstractService
     public function getData(array $options)
     {
         $twitter = new TwitterService(array(
+            'httpClientOptions' => [
+                'adapter' => 'Zend\Http\Client\Adapter\Curl'
+            ],
             'username'     => $this->_accessToken->getParam('screen_name'),
             'accessToken'  => $this->_accessToken,
             'oauthOptions' => array(
@@ -168,6 +171,9 @@ class Twitter extends AbstractService
     public function getFriends()
     {
         $twitter = new TwitterService(array(
+            'httpClientOptions' => [
+                'adapter' => 'Zend\Http\Client\Adapter\Curl'
+            ],
             'username'     => $this->_accessToken->getParam('screen_name'),
             'accessToken'  => $this->_accessToken,
             'oauthOptions' => array(
@@ -179,26 +185,23 @@ class Twitter extends AbstractService
         $friendsId = array();
         $count = 1000;
         while (true) {
-            $client = $twitter->getHttpClient()->setUri('https://api.twitter.com/1.1/friends/ids.json');
-            $client->setParameterGet(array(
-                "user_id" => $this->_accessToken->getParam('user_id'),
-                'cursor'  => $cursor,
-                'count'   => $count
-            ));
-            $client->setEncType();
-            $response = $client->request('GET');
-            if ($response->isSuccessful()) {
-                $response = Json::decode($response->getBody());
-                foreach ($response['ids'] as &$value) {
+            $response = $twitter->friendsIds($cursor, $count);
+            if ($response->isSuccess()) {
+                $cursor ++;
+                $val = $response->toValue();
+                foreach ($val->ids as &$value) {
                     $friendsId[] = (string) $value;
                 }
-                if (count($response['ids']) != $count)
+                if (count($val->ids) != $count) {
                     break;
-                $cursor ++;
-            }
-            if (!$response->isSuccess()) {
-                $message = 'Error requesting data';
-                throw new Exception($message);
+                }
+            } else {
+                $val = $response->toValue();
+                $messages = [];
+                foreach ($val->errors as $error) {
+                    $messages[] = $error->message;
+                }
+                throw new Exception('Error requesting data: ' . implode("\n", $messages));
             }
         }
         return $friendsId;

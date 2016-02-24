@@ -10,6 +10,8 @@ use League\OAuth2\Client\Provider\Facebook as FacebookProvider;
 
 use DateTime;
 
+use Zend_Json;
+
 class Facebook extends LeagueOAuth2
 {
     private $_graphApiVersion = 'v2.5';
@@ -55,8 +57,7 @@ class Facebook extends LeagueOAuth2
     }*/
 
     /**
-     * @see Autowp_ExternalLoginService_Abstract::getData()
-     * @return Autowp_ExternalLoginService_Result
+     * @return Result
      */
     public function getData(array $options)
     {
