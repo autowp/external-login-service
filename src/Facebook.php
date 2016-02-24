@@ -10,7 +10,7 @@ use League\OAuth2\Client\Provider\Facebook as FacebookProvider;
 
 use DateTime;
 
-use Zend_Json;
+use Zend\Json\Json;
 
 class Facebook extends LeagueOAuth2
 {
@@ -122,18 +122,18 @@ class Facebook extends LeagueOAuth2
 
             $response = file_get_contents($url);
             try {
-                $response = Zend_Json::decode($response);
-            } catch (Exception $e) {
+                $response = Json::decode($response);
+            } catch (Json\Exception\RuntimeException $e) {
                 $response = null;
             }
 
             if ($response) {
-                foreach ($response['data'] as $key => $value) {
+                foreach ($response->data as $key => $value) {
                     $friendsId[] = (string)$value['id'];
                 }
                 if (count($friendsId) == 0) break;
-                if (count($friendsId) == $limit && isset($response['paging']['next'])) {
-                    $url = $response['paging']['next'];
+                if (count($friendsId) == $limit && isset($response->paging->next)) {
+                    $url = $response->paging->next;
                 } else {
                     break;
                 }
