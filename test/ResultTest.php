@@ -11,7 +11,7 @@ use DateTime;
  */
 class ResultTest extends \PHPUnit_Framework_TestCase
 {
-    
+
     public function testBasicCorect()
     {
         $data = array(
@@ -21,12 +21,13 @@ class ResultTest extends \PHPUnit_Framework_TestCase
             'photoUrl'   => 'http://google.com/image.png',
             'email'      => 'test@example.com',
             'birthday'   => new DateTime(),
-            'residence'  => null,
-            'gender'     => null
+            'location'   => null,
+            'gender'     => null,
+            'language'   => null
         );
-    
+
         $result = new Result($data);
-    
+
         $this->assertEquals($data, $result->toArray());
     }
 
@@ -42,8 +43,9 @@ class ResultTest extends \PHPUnit_Framework_TestCase
             'photoUrl'   => 'google.com/image.png',
             'email'      => 'test@example.com',
             'birthday'   => null,
-            'residence'  => null,
-            'gender'     => null
+            'location'   => null,
+            'gender'     => null,
+            'language'   => null
         ));
     }
 
@@ -51,7 +53,7 @@ class ResultTest extends \PHPUnit_Framework_TestCase
      * @expectedException \Autowp\ExternalLoginService\InvalidEmailAddressException
      */
     public function testIncorrectEmailThrowsException()
-    {    
+    {
         $result = new Result(array(
             'externalId' => '123',
             'name'       => 'Ivanov Ivan',
@@ -59,8 +61,9 @@ class ResultTest extends \PHPUnit_Framework_TestCase
             'photoUrl'   => null,
             'email'      => 'example.com',
             'birthday'   => null,
-            'residence'  => null,
-            'gender'     => null
+            'location'   => null,
+            'gender'     => null,
+            'language'   => null
         ));
     }
 }
