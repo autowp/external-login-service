@@ -13,43 +13,47 @@ class Result
     /**
      * @var string
      */
-    private $_externalId = null;
+    private $externalId = null;
 
     /**
      * @var string
      */
-    private $_name = null;
+    private $name = null;
 
     /**
      * @var string
      */
-    private $_profileUrl = null;
+    private $profileUrl = null;
 
     /**
      * @var string
      */
-    private $_photoUrl = null;
+    private $photoUrl = null;
 
     /**
      * @var DateTime
      */
-    private $_birthday = null;
+    private $birthday = null;
 
     /**
      * @var string
      */
-    private $_email = null;
-
-    /**
-     * @var string
-     */
-    private $_residence = null;
-
+    private $email = null;
 
     /**
      * @var int
      */
-    private $_gender = null;
+    private $gender = null;
+
+    /**
+     * @var string
+     */
+    private $location = null;
+
+    /**
+     * @var string
+     */
+    private $language = null;
 
     /**
      * @param array $options
@@ -87,7 +91,7 @@ class Result
      */
     public function setExternalId($externalId)
     {
-        $this->_externalId = (string)$externalId;
+        $this->externalId = (string)$externalId;
 
         return $this;
     }
@@ -97,7 +101,7 @@ class Result
      */
     public function getExternalId()
     {
-        return $this->_externalId;
+        return $this->externalId;
     }
 
     /**
@@ -106,7 +110,7 @@ class Result
      */
     public function setName($name)
     {
-        $this->_name = (string)$name;
+        $this->name = (string)$name;
 
         return $this;
     }
@@ -116,7 +120,7 @@ class Result
      */
     public function getName()
     {
-        return $this->_name;
+        return $this->name;
     }
 
     /**
@@ -128,15 +132,15 @@ class Result
         $profileUrl = (string)$profileUrl;
 
         if ($profileUrl) {
-            $this->_profileUrl = $profileUrl;
+            $this->profileUrl = $profileUrl;
             /*if (Zend_Uri::check($profileUrl)) {
-                $this->_profileUrl = $profileUrl;
+                $this->profileUrl = $profileUrl;
             } else {
                 $message = "Invalid profile url `$profileUrl`";
                 throw new Exception($message);
             }*/
         } else {
-            $this->_profileUrl = null;
+            $this->profileUrl = null;
         }
 
         return $this;
@@ -147,7 +151,7 @@ class Result
      */
     public function getProfileUrl()
     {
-        return $this->_profileUrl;
+        return $this->profileUrl;
     }
 
     /**
@@ -159,18 +163,18 @@ class Result
         $photoUrl = (string)$photoUrl;
 
         if ($photoUrl) {
-            
+
             $validator = new Uri([
                 'allowRelative' => false
             ]);
-            
+
             if ($validator->isValid($photoUrl)) {
-                $this->_photoUrl = $photoUrl;
+                $this->photoUrl = $photoUrl;
             } else {
                 throw new InvalidUriException("Invalid profile url `$photoUrl`");
             }
         } else {
-            $this->_photoUrl = null;
+            $this->photoUrl = null;
         }
 
         return $this;
@@ -181,7 +185,7 @@ class Result
      */
     public function getPhotoUrl()
     {
-        return $this->_photoUrl;
+        return $this->photoUrl;
     }
 
     /**
@@ -191,18 +195,18 @@ class Result
     public function setEmail($email)
     {
         $email = (string)$email;
-        
+
         if ($email) {
-        
+
             $validator = new EmailAddress();
-        
+
             if ($validator->isValid($email)) {
-                $this->_email = $email;
+                $this->email = $email;
             } else {
                 throw new InvalidEmailAddressException("Invalid e-mail `$email`");
             }
         } else {
-            $this->_email = null;
+            $this->email = null;
         }
 
         return $this;
@@ -213,7 +217,7 @@ class Result
      */
     public function getEmail()
     {
-        return $this->_email;
+        return $this->email;
     }
 
     /**
@@ -222,7 +226,7 @@ class Result
      */
     public function setBirthday(DateTime $birthday = null)
     {
-        $this->_birthday = $birthday;
+        $this->birthday = $birthday;
 
         return $this;
     }
@@ -232,26 +236,7 @@ class Result
      */
     public function getBirthday()
     {
-        return $this->_birthday;
-    }
-
-    /**
-     * @param string $residence
-     * @return Result
-     */
-    public function setResidence($residence)
-    {
-        $this->_residence = (string)$residence;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getResidence()
-    {
-        return $this->_residence;
+        return $this->birthday;
     }
 
     /**
@@ -260,7 +245,7 @@ class Result
      */
     public function setGender($gender)
     {
-        $this->_gender = $gender;
+        $this->gender = $gender;
 
         return $this;
     }
@@ -270,7 +255,29 @@ class Result
      */
     public function getGender()
     {
-        return $this->_gender;
+        return $this->gender;
+    }
+
+    /**
+     * @param string $location
+     * @return Result
+     */
+    public function setLocation($location)
+    {
+        $this->location = $location;
+
+        return $this;
+    }
+
+    /**
+     * @param string $language
+     * @return Result
+     */
+    public function setLanguage($language)
+    {
+        $this->language = $language;
+
+        return $this;
     }
 
     /**
@@ -279,14 +286,15 @@ class Result
     public function toArray()
     {
         return [
-            'externalId' => $this->_externalId,
-            'name'       => $this->_name,
-            'profileUrl' => $this->_profileUrl,
-            'photoUrl'   => $this->_photoUrl,
-            'email'      => $this->_email,
-            'birthday'   => $this->_birthday,
-            'residence'  => $this->_residence,
-            'gender'     => $this->_gender
+            'externalId' => $this->externalId,
+            'name'       => $this->name,
+            'profileUrl' => $this->profileUrl,
+            'photoUrl'   => $this->photoUrl,
+            'email'      => $this->email,
+            'birthday'   => $this->birthday,
+            'gender'     => $this->gender,
+            'location'   => $this->location,
+            'language'   => $this->language
         ];
     }
 

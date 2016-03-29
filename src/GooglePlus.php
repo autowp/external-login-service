@@ -8,6 +8,8 @@ use Autowp\ExternalLoginService\Result;
 
 use League\OAuth2\Client\Provider\Google as GoogleProvider;
 
+use DateTime;
+
 class GooglePlus extends LeagueOAuth2
 {
     protected function _createProvider()
@@ -16,7 +18,8 @@ class GooglePlus extends LeagueOAuth2
             'clientId'     => $this->_options['clientId'],
             'clientSecret' => $this->_options['clientSecret'],
             'redirectUri'  => $this->_options['redirect_uri'],
-            'userFields'   => ['id', 'displayName', 'url', 'image(url)']
+            'userFields'   => ['id', 'displayName', 'url', 'image(url)',
+                               'gender', 'language', 'placesLived', 'birthday']
             //'hostedDomain' => 'example.com',
         ]);
     }
@@ -24,7 +27,7 @@ class GooglePlus extends LeagueOAuth2
     protected function _getAuthorizationUrl()
     {
         return $this->_getProvider()->getAuthorizationUrl(array(
-            'scope' => 'https://www.googleapis.com/auth/plus.me'
+            'scope' => 'https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
         ));
     }
 
@@ -40,25 +43,46 @@ class GooglePlus extends LeagueOAuth2
     {
         $provider = $this->_getProvider();
 
-        $data = array(
-            'externalId' => null,
-            'name'       => null,
-            'profileUrl' => null,
-            'photoUrl'   => null
-        );
-
         $ownerDetails = $provider->getResourceOwner($this->_accessToken);
 
         $ownerDetailsArray = $ownerDetails->toArray();
 
-        $data['externalId'] = $ownerDetailsArray['id'];
+        $email = null;
+        if (isset($ownerDetailsArray['emails']) && is_array($ownerDetailsArray['emails'])) {
+            foreach ($ownerDetailsArray['emails'] as $value) {
+                if ($value['value']) {
+                    $email = $value['value'];
+                    break;
+                }
+            }
+        }
 
-        return new Result(array(
+        $location = null;
+        if (isset($ownerDetailsArray['placesLived']) && is_array($ownerDetailsArray['placesLived'])) {
+            foreach ($ownerDetailsArray['placesLived'] as $value) {
+                if ($value['value']) {
+                    $location = $value['value'];
+                    break;
+                }
+            }
+        }
+
+        $birthday = null;
+        if (isset($ownerDetailsArray['birthday']) && $ownerDetailsArray['birthday']) {
+            $birthday = DateTime::createFromFormat('Y-m-d', $ownerDetailsArray['birthday']);
+        }
+
+        return new Result([
             'externalId' => $ownerDetailsArray['id'],
             'name'       => $ownerDetailsArray['displayName'],
             'profileUrl' => $ownerDetailsArray['url'],
-            'photoUrl'   => $ownerDetailsArray['image']['url']
-        ));
+            'photoUrl'   => $ownerDetailsArray['image']['url'],
+            'email'      => $email,
+            'gender'     => $ownerDetailsArray['gender'],
+            'language'   => $ownerDetailsArray['language'],
+            'location'   => $location,
+            'birthday'   => $birthday
+        ]);
     }
 
     public function getFriendsUrl()

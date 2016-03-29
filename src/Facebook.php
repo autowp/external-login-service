@@ -12,6 +12,8 @@ use DateTime;
 
 use Zend\Json\Json;
 
+use Zend_Locale;
+
 class Facebook extends LeagueOAuth2
 {
     private $_graphApiVersion = 'v2.5';
@@ -74,8 +76,9 @@ class Facebook extends LeagueOAuth2
             'photoUrl'   => null,
             'birthday'   => null,
             'email'      => null,
-            'residence'  => null,
-            'gender'     => null
+            'gender'     => null,
+            'location'   => null,
+            'language'   => null
         );
         if (isset($json['id']) && $json['id']) {
             $data['externalId'] = $json['id'];
@@ -93,11 +96,17 @@ class Facebook extends LeagueOAuth2
         if (isset($json['email']) && $json['email']) {
             $data['email'] = $json['email'];
         }
-        if (isset($json['location']) && isset($json['location']['name']) && $json['location']['name']) {
-            $data['residence'] = $json['location']['name'];
-        }
         if (isset($json['gender']) && $json['gender']) {
             $data['gender'] = $json['gender'];
+        }
+        if (isset($json['location']) && $json['location']) {
+            if (isset($json['location']['name']) && $json['location']['name']) {
+                $data['location'] = $json['location']['name'];
+            }
+        }
+        if (isset($json['locale']) && $json['locale']) {
+            $locale = new Zend_Locale($json['locale']);
+            $data['language'] = $locale->getLanguage();
         }
         return new Result($data);
     }
