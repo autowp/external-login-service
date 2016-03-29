@@ -6,7 +6,7 @@ use Autowp\ExternalLoginService\Exception;
 use Autowp\ExternalLoginService\LeagueOAuth2;
 use Autowp\ExternalLoginService\Result;
 
-use League\OAuth2\Client\Provider\Facebook as FacebookProvider;
+use Autowp\ExternalLoginService\Provider\Facebook as FacebookProvider;
 
 use DateTime;
 
@@ -88,7 +88,7 @@ class Facebook extends LeagueOAuth2
             $data['profileUrl'] = $json['link'];
         }
         if (isset($json['birthday']) && $json['birthday']) {
-            $data['birthday'] = DateTime::createFromFormat('d/m/Y', $json['birthday']);
+            $data['birthday'] = DateTime::createFromFormat('m/d/Y', $json['birthday']);
         }
         if (isset($json['email']) && $json['email']) {
             $data['email'] = $json['email'];
