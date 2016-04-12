@@ -5,6 +5,7 @@ namespace Autowp\ExternalLoginService;
 use Autowp\ExternalLoginService\Exception;
 use Autowp\ExternalLoginService\AbstractService;
 use Autowp\ExternalLoginService\Result;
+use Autowp\ExternalLoginService\Service\Twitter as TwitterService;
 
 use Zend_Session_Namespace;
 
@@ -12,7 +13,6 @@ use Zend\Http;
 use ZendOAuth\Consumer;
 use ZendOAuth\OAuth;
 use ZendOAuth\Token\Access;
-use ZendService\Twitter\Twitter as TwitterService;
 
 class Twitter extends AbstractService
 {
@@ -145,7 +145,9 @@ class Twitter extends AbstractService
                 'consumerSecret' => $this->_options['consumerSecret']
             )
         ));
-        $response = $twitter->account->verifyCredentials();
+        $response = $twitter->account->verifyCredentials([
+            'include_email' => 'true'
+        ]);
 
         if (!$response->isSuccess()) {
             $message = 'Error requesting data: ' . implode(', ', $response->getErrors());
@@ -153,6 +155,7 @@ class Twitter extends AbstractService
         }
 
         $values = $response->toValue();
+
         $imageUrl = null;
         if ($values->profile_image_url) {
             $imageUrl = str_replace('_normal', '', $values->profile_image_url);
@@ -162,7 +165,10 @@ class Twitter extends AbstractService
             'externalId' => $values->id,
             'name'       => $values->name,
             'profileUrl' => 'http://twitter.com/' . $values->screen_name,
-            'photoUrl'   => $imageUrl
+            'photoUrl'   => $imageUrl,
+            'location'   => $values->location,
+            'language'   => $values->lang,
+            'email'      => isset($values->email) ? $values->email : null
         );
 
         return new Result($data);

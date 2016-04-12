@@ -104,6 +104,12 @@ class Facebook extends LeagueOAuth2
                 $data['location'] = $json['location']['name'];
             }
         }
+        if (isset($json['hometown']) && $json['hometown']) {
+            if (isset($json['hometown']['name']) && $json['hometown']['name']) {
+                $data['location'] = $json['hometown']['name'];
+            }
+        }
+
         if (isset($json['locale']) && $json['locale']) {
             $locale = new Zend_Locale($json['locale']);
             $data['language'] = $locale->getLanguage();
