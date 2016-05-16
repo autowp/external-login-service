@@ -143,8 +143,10 @@ class Facebook extends LeagueOAuth2
             }
 
             if ($response) {
-                foreach ($response->data as $key => $value) {
-                    $friendsId[] = (string)$value['id'];
+                if (isset($response->data) && is_array($response->data)) {
+                    foreach ($response->data as $key => $value) {
+                        $friendsId[] = (string)$value['id'];
+                    }
                 }
                 if (count($friendsId) == 0) break;
                 if (count($friendsId) == $limit && isset($response->paging->next)) {
