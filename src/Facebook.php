@@ -30,13 +30,15 @@ class Facebook extends LeagueOAuth2
 
     protected function _getAuthorizationUrl()
     {
-        return $this->_getProvider()->getAuthorizationUrl();
+        return $this->_getProvider()->getAuthorizationUrl([
+            'scope' => ['public_profile', 'user_friends', 'user_hometown']
+        ]);
     }
 
     protected function _getFriendsAuthorizationUrl()
     {
         return $this->_getProvider()->getAuthorizationUrl([
-            'scope' => ['public_profile', 'user_friends']
+            'scope' => ['public_profile', 'user_friends', 'user_hometown']
         ]);
     }
 
@@ -69,7 +71,7 @@ class Facebook extends LeagueOAuth2
 
         $json = $ownerDetails->toArray();
 
-        $data = array(
+        $data = [
             'externalId' => null,
             'name'       => null,
             'profileUrl' => null,
@@ -79,7 +81,7 @@ class Facebook extends LeagueOAuth2
             'gender'     => null,
             'location'   => null,
             'language'   => null
-        );
+        ];
         if (isset($json['id']) && $json['id']) {
             $data['externalId'] = $json['id'];
             $data['photoUrl'] = sprintf($this->_imageUrlTemplate, $json['id']);
@@ -141,11 +143,11 @@ class Facebook extends LeagueOAuth2
             } catch (Json\Exception\RuntimeException $e) {
                 $response = null;
             }
-
+            
             if ($response) {
                 if (isset($response->data) && is_array($response->data)) {
                     foreach ($response->data as $key => $value) {
-                        $friendsId[] = (string)$value['id'];
+                        $friendsId[] = (string)$value->id;
                     }
                 }
                 if (count($friendsId) == 0) break;
