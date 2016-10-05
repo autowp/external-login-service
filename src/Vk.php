@@ -5,7 +5,7 @@ namespace Autowp\ExternalLoginService;
 use Autowp\ExternalLoginService\Exception;
 use Autowp\ExternalLoginService\LeagueOAuth2;
 use Autowp\ExternalLoginService\Result;
-use Autowp\OAuth2\Client\Provider\Vk as VkProvider;
+use Autowp\ExternalLoginService\Provider\Vk as VkProvider;
 
 class Vk extends LeagueOAuth2
 {
@@ -41,17 +41,17 @@ class Vk extends LeagueOAuth2
 
         $ownerDetails = $provider->getResourceOwner($this->_accessToken);
 
-        $data = array(
+        $data = [
             'externalId' => null,
             'name'       => null,
             'profileUrl' => null,
             'photoUrl'   => null
-        );
+        ];
 
         $vkUser = $ownerDetails->toArray();
 
-        if (isset($vkUser['uid']) && $vkUser['uid']) {
-            $data['externalId'] = $vkUser['uid'];
+        if (isset($vkUser['id']) && $vkUser['id']) {
+            $data['externalId'] = $vkUser['id'];
         }
 
         $firstName = false;
@@ -66,8 +66,8 @@ class Vk extends LeagueOAuth2
         if (isset($vkUser['screen_name']) && $vkUser['screen_name']) {
             $data['profileUrl'] = 'http://vk.com/' . $vkUser['screen_name'];
         }
-        if (isset($vkUser['photo_medium']) && $vkUser['photo_medium']) {
-            $data['photoUrl'] = $vkUser['photo_medium'];
+        if (isset($vkUser['photo_max_orig']) && $vkUser['photo_max_orig']) {
+            $data['photoUrl'] = $vkUser['photo_max_orig'];
         }
 
         return new Result($data);
@@ -82,7 +82,7 @@ class Vk extends LeagueOAuth2
     {
         throw new Exception("Not implemented");
     }
-    
+
     public function getFriends()
     {
         throw new Exception("Not implemented");
