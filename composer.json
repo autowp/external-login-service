@@ -17,6 +17,7 @@
         "zendframework/zend-session": "*",
         "zendframework/zend-filter": "2.*",
         "zendframework/zend-uri": "*",
+        "league/oauth1-client": "*",
         "league/oauth2-client": "^1.1",
         "league/oauth2-facebook": "^1.1",
         "league/oauth2-github": "^0.2.0",
