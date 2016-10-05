@@ -12,11 +12,11 @@ use DateTime;
 
 use Zend\Json\Json;
 
-use Zend_Locale;
-
 class Facebook extends LeagueOAuth2
 {
     private $_graphApiVersion = 'v2.5';
+
+    private $defaultScope = ['public_profile', 'user_friends', 'user_hometown'];
 
     protected function _createProvider()
     {
@@ -28,17 +28,27 @@ class Facebook extends LeagueOAuth2
         ]);
     }
 
+    private function getScope()
+    {
+        $scope = $this->defaultScope;
+        if (isset($this->_options['scope']) && is_array($this->_options['scope'])) {
+            $scope = $this->_options['scope'];
+        }
+
+        return $scope;
+    }
+
     protected function _getAuthorizationUrl()
     {
         return $this->_getProvider()->getAuthorizationUrl([
-            'scope' => ['public_profile', 'user_friends', 'user_hometown']
+            'scope' => $this->getScope()
         ]);
     }
 
     protected function _getFriendsAuthorizationUrl()
     {
         return $this->_getProvider()->getAuthorizationUrl([
-            'scope' => ['public_profile', 'user_friends', 'user_hometown']
+            'scope' => $this->getScope()
         ]);
     }
 
@@ -113,8 +123,7 @@ class Facebook extends LeagueOAuth2
         }
 
         if (isset($json['locale']) && $json['locale']) {
-            $locale = new Zend_Locale($json['locale']);
-            $data['language'] = $locale->getLanguage();
+            $data['language'] = \Locale::getPrimaryLanguage($json['locale']);
         }
         return new Result($data);
     }
@@ -143,7 +152,7 @@ class Facebook extends LeagueOAuth2
             } catch (Json\Exception\RuntimeException $e) {
                 $response = null;
             }
-            
+
             if ($response) {
                 if (isset($response->data) && is_array($response->data)) {
                     foreach ($response->data as $key => $value) {

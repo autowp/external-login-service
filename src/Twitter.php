@@ -5,68 +5,63 @@ namespace Autowp\ExternalLoginService;
 use Autowp\ExternalLoginService\Exception;
 use Autowp\ExternalLoginService\AbstractService;
 use Autowp\ExternalLoginService\Result;
-use Autowp\ExternalLoginService\Service\Twitter as TwitterService;
 
-use Zend_Session_Namespace;
-
-use Zend\Http;
-use ZendOAuth\Consumer;
-use ZendOAuth\OAuth;
-use ZendOAuth\Token\Access;
+use League\OAuth1\Client\Server\Twitter as TwitterServer;
+use GuzzleHttp\Exception\BadResponseException;
 
 class Twitter extends AbstractService
 {
     /**
-     * @var Consumer
+     * @var Twitter
      */
-    protected $_consumer = null;
+    protected $server = null;
 
     /**
      *
-     * @var Zend_Session_Namespace
+     * @var \Zend\Session\Container
      */
-    protected $_session;
+    protected $session;
 
     /**
      *
      * @var Access
      */
-    protected $_accessToken = null;
+    protected $accessToken = null;
 
     /**
      * @var string
      */
-    private $_state = null;
+    private $state = null;
 
-    protected function _getSession()
+    protected function getSession()
     {
-        return $this->_session ? $this->_session : $this->_session = new Zend_Session_Namespace(
-                'Twitter');
+        return $this->session ? $this->session : $this->session = new \Zend\Session\Container('Twitter');
     }
 
-    public function getConsumer(array $options = array())
+    /**
+     * @return TwitterServer
+     */
+    public function getServer()
     {
-        if (!$this->_consumer) {
-            $consumerOptions = array(
-                'requestScheme'   => OAuth::REQUEST_SCHEME_HEADER,
-                'requestTokenUrl' => 'https://api.twitter.com/oauth/request_token',
-                'accessTokenUrl'  => 'https://api.twitter.com/oauth/access_token',
-                'siteUrl'         => "http://twitter.com/oauth",
-                'consumerKey'     => $this->_options['consumerKey'],
-                'consumerSecret'  => $this->_options['consumerSecret']
-            );
+        if (!$this->server) {
+            
+            $serverOptions = [
+                'identifier' => $this->_options['consumerKey'],
+                'secret'     => $this->_options['consumerSecret']
+            ];
             if (isset($this->_options['redirect_uri'])) {
-                $consumerOptions['callbackUrl'] = $this->_options['redirect_uri'];
+                $serverOptions['callback_uri'] = $this->_options['redirect_uri'];
             }
-            $this->_consumer = new Consumer($consumerOptions);
+            
+            $this->server = new TwitterServer($serverOptions);
         }
 
-        return $this->_consumer;
+        return $this->server;
     }
 
     public function getState()
     {
-        return $this->_state;
+        return $this->state;
     }
 
     /**
@@ -75,16 +70,16 @@ class Twitter extends AbstractService
      */
     public function getLoginUrl()
     {
-        $consumer = $this->getConsumer(array(
-            'redirect_uri' => $this->_options['redirect_uri']
-        ));
-
-        $requestToken = $consumer->getRequestToken();
-
-        $this->_state = $requestToken->getToken();
-
-        $this->_getSession()->requestToken = $requestToken;
-        return $consumer->getRedirectUrl();
+        $temporaryCredentials = $this->getServer()->getTemporaryCredentials();
+        
+        // Store credentials in the session, we'll need them later
+        $this->getSession()->temporaryCredentials = $temporaryCredentials;
+        
+        $this->state = $temporaryCredentials->getIdentifier();
+        
+        // Second part of OAuth 1.0 authentication is to redirect the
+        // resource owner to the login screen on the server.
+        return $this->getServer()->getAuthorizationUrl($temporaryCredentials);
     }
 
     /**
@@ -93,16 +88,16 @@ class Twitter extends AbstractService
      */
     public function getFriendsUrl()
     {
-        $consumer = $this->getConsumer(array(
-            'redirect_uri' => $this->_options['redirect_uri']
-        ));
-
-        $requestToken = $consumer->getRequestToken();
-
-        $this->_state = $requestToken->getToken();
-
-        $this->_getSession()->requestToken = $requestToken;
-        return $consumer->getRedirectUrl();
+        $temporaryCredentials = $this->getServer()->getTemporaryCredentials();
+        
+        // Store credentials in the session, we'll need them later
+        $this->getSession()->temporaryCredentials = $temporaryCredentials;
+        
+        $this->state = $temporaryCredentials->getIdentifier();
+        
+        // Second part of OAuth 1.0 authentication is to redirect the
+        // resource owner to the login screen on the server.
+        return $this->getServer()->getAuthorizationUrl($temporaryCredentials);
     }
 
     /**
@@ -113,19 +108,25 @@ class Twitter extends AbstractService
         if (isset($params['denied']) && $params['denied']) {
             return false;
         }
-        $session = $this->_getSession();
-        if (!isset($this->_getSession()->requestToken)) {
+        
+        // Retrieve the temporary credentials we saved before
+        $session = $this->getSession();
+        if (!isset($session->temporaryCredentials)) {
             throw new Exception('Request token not set');
         }
-
-        $consumer = $this->getConsumer(array(
-            'redirect_uri' => $this->_options['redirect_uri']
-        ));
-        $this->_accessToken = $consumer->getAccessToken($params,
-                $this->_getSession()->requestToken);
-        unset($this->_getSession()->requestToken);
-
-        return $this->_accessToken;
+        
+        $temporaryCredentials = $session->temporaryCredentials;
+        
+        // We will now retrieve token credentials from the server
+        $tokenCredentials = $this->getServer()->getTokenCredentials(
+            $temporaryCredentials, 
+            $params['oauth_token'], 
+            $params['oauth_verifier']
+        );
+        
+        $this->accessToken = $tokenCredentials;
+        
+        return $tokenCredentials;
     }
 
     /**
@@ -134,89 +135,86 @@ class Twitter extends AbstractService
      */
     public function getData(array $options)
     {
-        $twitter = new TwitterService(array(
-            'httpClientOptions' => [
-                'adapter' => 'Zend\Http\Client\Adapter\Curl'
-            ],
-            'username'     => $this->_accessToken->getParam('screen_name'),
-            'accessToken'  => $this->_accessToken,
-            'oauthOptions' => array(
-                'consumerKey'    => $this->_options['consumerKey'],
-                'consumerSecret' => $this->_options['consumerSecret']
-            )
-        ));
-        $response = $twitter->account->verifyCredentials([
-            'include_email' => 'true'
-        ]);
-
-        if (!$response->isSuccess()) {
-            $message = 'Error requesting data: ' . implode(', ', $response->getErrors());
-            throw new Exception($message);
-        }
-
-        $values = $response->toValue();
-
+        $user = $this->getServer()->getUserDetails($this->accessToken);
+        
         $imageUrl = null;
-        if ($values->profile_image_url) {
-            $imageUrl = str_replace('_normal', '', $values->profile_image_url);
+        if ($user->imageUrl) {
+            $imageUrl = str_replace('_normal', '', $user->imageUrl);
         }
-
-        $data = array(
-            'externalId' => $values->id,
-            'name'       => $values->name,
-            'profileUrl' => 'http://twitter.com/' . $values->screen_name,
+        
+        $data = [
+            'externalId' => $user->uid,
+            'name'       => $user->name,
+            'profileUrl' => 'http://twitter.com/' . $user->nickname,
             'photoUrl'   => $imageUrl,
-            'location'   => $values->location,
-            'language'   => $values->lang,
-            'email'      => isset($values->email) ? $values->email : null
-        );
-
+            'location'   => $user->location,
+            'language'   => $user->lang,
+            'email'      => isset($user->email) ? $user->email : null
+        ];
+        
         return new Result($data);
+    }
+    
+    private function friendsIds($cursor, $count)
+    {
+        $url = 'https://api.twitter.com/1.1/friends/ids.json';
+        
+        $url .= '?' . http_build_query([
+            'cursor' => $cursor,
+            'count'  => $count
+        ]);
+        
+        $client = $this->getServer()->createHttpClient();
+        
+        $headers = $this->getServer()->getHeaders($this->accessToken, 'GET', $url);
+        
+        try {
+            $response = $client->get($url, [
+                'headers' => $headers,
+            ]);
+        } catch (BadResponseException $e) {
+            $response = $e->getResponse();
+            $body = $response->getBody();
+            $statusCode = $response->getStatusCode();
+        
+            throw new \Exception(
+                "Received error [$body] with status code [$statusCode] when retrieving token credentials."
+            );
+        }
+        $data = json_decode((string) $response->getBody(), true);
+        
+        return $data;
     }
 
     public function getFriends()
     {
-        $twitter = new TwitterService(array(
-            'httpClientOptions' => [
-                'adapter' => 'Zend\Http\Client\Adapter\Curl'
-            ],
-            'username'     => $this->_accessToken->getParam('screen_name'),
-            'accessToken'  => $this->_accessToken,
-            'oauthOptions' => array(
-                'consumerKey'    => $this->_options['consumerKey'],
-                'consumerSecret' => $this->_options['consumerSecret']
-            )
-        ));
         $cursor = - 1;
-        $friendsId = array();
+        $friendsId = [];
         $count = 1000;
         while (true) {
-            $response = $twitter->friendsIds($cursor, $count);
-            if ($response->isSuccess()) {
-                $cursor ++;
-                $val = $response->toValue();
-                foreach ($val->ids as &$value) {
-                    $friendsId[] = (string) $value;
-                }
-                if (count($val->ids) != $count) {
-                    break;
-                }
-            } else {
-                $val = $response->toValue();
-                $messages = [];
-                foreach ($val->errors as $error) {
-                    $messages[] = $error->message;
-                }
-                throw new Exception('Error requesting data: ' . implode("\n", $messages));
+            
+            $response = $this->friendsIds($cursor, $count);
+            if (!$response) {
+                break;
             }
+                
+            foreach ($response['ids'] as &$value) {
+                $friendsId[] = (string) $value;
+            }
+            if (count($response['ids']) != $count) {
+                break;
+            }
+            
+            $cursor++;
         }
         return $friendsId;
     }
 
     public function setAccessToken(array $params)
     {
-        $this->_accessToken = new Access();
-        $this->_accessToken->setParams($params);
-        return $this;
+        throw new \Exception("Not implemented");
+        /*$this->accessToken = new Access();
+        $this->accessToken->setParams($params);
+        return $this;*/
     }
 }

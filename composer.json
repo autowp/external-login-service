@@ -12,7 +12,9 @@
     "minimum-stability": "beta",
     "require": {
         "php": ">=5.5.0",
-        "zendframework/zendframework1": "1.*",
+        "ext-intl": "*",
+        "ext-json": "*",
+        "zendframework/zend-session": "*",
         "zendframework/zend-filter": "2.*",
         "league/oauth2-client": "^1.1",
         "league/oauth2-facebook": "^1.1",
@@ -22,8 +24,7 @@
         "league/oauth2-linkedin": "^0.4.0",
         "autowp/oauth2-vk": "^1.0",
         "zendframework/zend-validator": "^2.6",
-        "zendframework/zend-json": "^2.6",
-        "autowp/zendservice-twitter": "^2.1"
+        "zendframework/zend-json": "^2.6"
     },
     "require-dev": {
         "phpunit/PHPUnit": "~4.0"
