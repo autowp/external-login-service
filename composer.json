@@ -15,7 +15,7 @@
         "ext-intl": "*",
         "ext-json": "*",
         "zendframework/zend-session": "*",
-        "zendframework/zend-filter": "2.*",
+        "zendframework/zend-filter": ">=2.7",
         "zendframework/zend-uri": "*",
         "league/oauth1-client": "*",
         "league/oauth2-client": "^1.1",
@@ -24,8 +24,8 @@
         "league/oauth2-google": "^1.0",
         "league/oauth2-instagram": "^0.2.1",
         "league/oauth2-linkedin": "^0.4.0",
-        "zendframework/zend-validator": "^2.6",
-        "zendframework/zend-json": "^2.6",
+        "zendframework/zend-validator": ">=2.6",
+        "zendframework/zend-json": ">=2.6",
         "j4k/oauth2-vkontakte": "*"
     },
     "require-dev": {
