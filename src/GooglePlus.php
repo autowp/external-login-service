@@ -17,7 +17,7 @@ class GooglePlus extends LeagueOAuth2
         return new GoogleProvider([
             'clientId'     => $this->_options['clientId'],
             'clientSecret' => $this->_options['clientSecret'],
-            'redirectUri'  => $this->_options['redirect_uri'],
+            'redirectUri'  => isset($this->_options['redirect_uri']) ? $this->_options['redirect_uri'] : null,
             'userFields'   => ['id', 'displayName', 'url', 'image(url)',
                                'gender', 'language', 'placesLived', 'birthday']
             //'hostedDomain' => 'example.com',

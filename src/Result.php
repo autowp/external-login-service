@@ -41,7 +41,7 @@ class Result
     private $email = null;
 
     /**
-     * @var int
+     * @var string
      */
     private $gender = null;
 
@@ -240,7 +240,7 @@ class Result
     }
 
     /**
-     * @param int $gender
+     * @param string $gender
      * @return Result
      */
     public function setGender($gender)
@@ -251,7 +251,7 @@ class Result
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getGender()
     {
@@ -267,6 +267,14 @@ class Result
         $this->location = $location;
 
         return $this;
+    }
+    
+    /**
+     * @return string $location
+     */
+    public function getLocation()
+    {
+        return $this->location;
     }
 
     /**

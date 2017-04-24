@@ -5,6 +5,7 @@ namespace Autowp\ExternalLoginService;
 use Autowp\ExternalLoginService\AbstractService;
 
 use League\OAuth2\Client\Provider\AbstractProvider;
+use League\OAuth2\Client\Token\AccessToken;
 
 abstract class LeagueOAuth2 extends AbstractService
 {
@@ -69,5 +70,14 @@ abstract class LeagueOAuth2 extends AbstractService
         ]);
 
         return $this->_accessToken;
+    }
+    
+    public function setAccessToken($accessToken)
+    {
+        $this->_accessToken = new AccessToken([
+            'access_token' => $accessToken
+        ]);
+        
+        return $this;
     }
 }
