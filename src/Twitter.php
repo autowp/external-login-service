@@ -128,7 +128,7 @@ class Twitter extends AbstractService
 
     /**
      * @return Result
-     * 
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function getData(array $options)

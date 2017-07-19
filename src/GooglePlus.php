@@ -42,7 +42,7 @@ class GooglePlus extends LeagueOAuth2
 
     /**
      * @return Result
-     * 
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function getData(array $options)
