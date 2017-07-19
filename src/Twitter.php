@@ -64,7 +64,6 @@ class Twitter extends AbstractService
     }
 
     /**
-     * @param array $options
      * @return string
      */
     public function getLoginUrl()
@@ -82,7 +81,6 @@ class Twitter extends AbstractService
     }
 
     /**
-     * @param array $options
      * @return string
      */
     public function getFriendsUrl()
@@ -129,8 +127,9 @@ class Twitter extends AbstractService
     }
 
     /**
-     *
      * @return Result
+     * 
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function getData(array $options)
     {
