@@ -29,7 +29,10 @@
         "j4k/oauth2-vkontakte": "*"
     },
     "require-dev": {
-        "phpunit/PHPUnit": "^6.0"
+        "phpunit/PHPUnit": "^6.0",
+        "satooshi/php-coveralls": "^1.0",
+        "codeclimate/php-test-reporter": "dev-master",
+        "zendframework/zend-coding-standard": "~1.0.0"
     },
     "autoload": {
         "psr-4": {
@@ -40,5 +43,16 @@
         "psr-4": {
             "AutowpTest\\ExternalLoginService\\": "test/"
         }
+    },
+    "scripts" : {
+        "check" : [
+            "@cs-check",
+            "@phpmd",
+            "@test"
+        ],
+        "cs-check" : "phpcs --encoding=utf-8",
+        "cs-fix" : "phpcbf --encoding=utf-8",
+        "test" : "phpunit --colors=always",
+        "phpmd" : "phpmd src,test text ruleset.xml --suffixes php,phtml"
     }
 }

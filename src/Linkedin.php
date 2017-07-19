@@ -10,21 +10,21 @@ use League\OAuth2\Client\Provider\LinkedIn as LinkedInProvider;
 
 class Linkedin extends LeagueOAuth2
 {
-    protected function _createProvider()
+    protected function createProvider()
     {
         return new LinkedInProvider([
-            'clientId'     => $this->_options['clientId'],
-            'clientSecret' => $this->_options['clientSecret'],
-            'redirectUri'  => $this->_options['redirect_uri']
+            'clientId'     => $this->options['clientId'],
+            'clientSecret' => $this->options['clientSecret'],
+            'redirectUri'  => $this->options['redirect_uri']
         ]);
     }
 
-    protected function _getAuthorizationUrl()
+    protected function getAuthorizationUrl()
     {
-        return $this->_getProvider()->getAuthorizationUrl();
+        return $this->getProvider()->getAuthorizationUrl();
     }
 
-    protected function _getFriendsAuthorizationUrl()
+    protected function getFriendsAuthorizationUrl()
     {
         throw new Exception("Not implemented");
     }
@@ -34,16 +34,16 @@ class Linkedin extends LeagueOAuth2
      */
     public function getData(array $options)
     {
-        $provider = $this->_getProvider();
+        $provider = $this->getProvider();
 
-        $ownerDetails = $provider->getResourceOwner($this->_accessToken);
+        $ownerDetails = $provider->getResourceOwner($this->accessToken);
 
-        return new Result(array(
+        return new Result([
             'externalId' => $ownerDetails->getId(),
             'name'       => trim($ownerDetails->getFirstname() . ' ' . $ownerDetails->getLastname()),
             'profileUrl' => $ownerDetails->getUrl(),
             'photoUrl'   => $ownerDetails->getImageurl()
-        ));
+        ]);
     }
 
     public function getFriendsUrl()

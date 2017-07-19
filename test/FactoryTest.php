@@ -17,7 +17,7 @@ use Autowp\ExternalLoginService\Vk;
  */
 class FactoryTest extends TestCase
 {
-    
+
     public function testServicesExists()
     {
         $factory = new Factory([
@@ -28,19 +28,17 @@ class FactoryTest extends TestCase
             'twitter'     => [],
             'vk'          => [],
         ]);
-    
-        $this->assertInstanceOf(Facebook::class, $factory->getService('facebook', 'facebook', []));
-        
-        $this->assertInstanceOf(Github::class, $factory->getService('github', 'github', []));
-        
-        $this->assertInstanceOf(GooglePlus::class, $factory->getService('google-plus', 'google-plus', []));
-        
-        $this->assertInstanceOf(Linkedin::class, $factory->getService('linkedin', 'linkedin', []));
-        
-        $this->assertInstanceOf(Twitter::class, $factory->getService('twitter', 'twitter', []));
-        
-        $this->assertInstanceOf(Vk::class, $factory->getService('vk', 'vk', []));
-        
-    }
 
+        $this->assertInstanceOf(Facebook::class, $factory->getService('facebook', 'facebook', []));
+
+        $this->assertInstanceOf(Github::class, $factory->getService('github', 'github', []));
+
+        $this->assertInstanceOf(GooglePlus::class, $factory->getService('google-plus', 'google-plus', []));
+
+        $this->assertInstanceOf(Linkedin::class, $factory->getService('linkedin', 'linkedin', []));
+
+        $this->assertInstanceOf(Twitter::class, $factory->getService('twitter', 'twitter', []));
+
+        $this->assertInstanceOf(Vk::class, $factory->getService('vk', 'vk', []));
+    }
 }

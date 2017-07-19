@@ -9,21 +9,21 @@ use Autowp\ExternalLoginService\Provider\Vk as VkProvider;
 
 class Vk extends LeagueOAuth2
 {
-    protected function _createProvider()
+    protected function createProvider()
     {
         return new VkProvider([
-            'clientId'     => $this->_options['clientId'],
-            'clientSecret' => $this->_options['clientSecret'],
-            'redirectUri'  => $this->_options['redirect_uri'],
+            'clientId'     => $this->options['clientId'],
+            'clientSecret' => $this->options['clientSecret'],
+            'redirectUri'  => $this->options['redirect_uri'],
         ]);
     }
 
-    protected function _getAuthorizationUrl()
+    protected function getAuthorizationUrl()
     {
-        return $this->_getProvider()->getAuthorizationUrl();
+        return $this->getProvider()->getAuthorizationUrl();
     }
 
-    protected function _getFriendsAuthorizationUrl()
+    protected function getFriendsAuthorizationUrl()
     {
         throw new Exception("Not implemented");
     }
@@ -33,13 +33,13 @@ class Vk extends LeagueOAuth2
      */
     public function getData(array $options)
     {
-        $provider = $this->_getProvider();
+        $provider = $this->getProvider();
 
         if (isset($options['language'])) {
             $provider->setLang($options['language']);
         }
 
-        $ownerDetails = $provider->getResourceOwner($this->_accessToken);
+        $ownerDetails = $provider->getResourceOwner($this->accessToken);
 
         $data = [
             'externalId' => null,
@@ -73,7 +73,10 @@ class Vk extends LeagueOAuth2
         return new Result($data);
     }
 
-    public function serviceFriends($token)
+    /**
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
+    public function serviceFriends(string $token)
     {
         throw new Exception("Not implemented");
     }

@@ -9,17 +9,13 @@ abstract class AbstractService
     /**
      * @var array
      */
-    protected $_options;
+    protected $options;
 
     /**
      * @return string
      */
     abstract public function getState();
 
-    /**
-     * @param array $options
-     * @return string
-     */
     abstract public function getLoginUrl();
 
     /**
@@ -45,6 +41,6 @@ abstract class AbstractService
 
     public function __construct(array $options)
     {
-        $this->_options = $options;
+        $this->options = $options;
     }
 }

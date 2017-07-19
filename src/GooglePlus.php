@@ -12,26 +12,30 @@ use DateTime;
 
 class GooglePlus extends LeagueOAuth2
 {
-    protected function _createProvider()
+    protected function createProvider()
     {
         return new GoogleProvider([
-            'clientId'     => $this->_options['clientId'],
-            'clientSecret' => $this->_options['clientSecret'],
-            'redirectUri'  => isset($this->_options['redirect_uri']) ? $this->_options['redirect_uri'] : null,
+            'clientId'     => $this->options['clientId'],
+            'clientSecret' => $this->options['clientSecret'],
+            'redirectUri'  => isset($this->options['redirect_uri']) ? $this->options['redirect_uri'] : null,
             'userFields'   => ['id', 'displayName', 'url', 'image(url)',
                                'gender', 'language', 'placesLived', 'birthday']
             //'hostedDomain' => 'example.com',
         ]);
     }
 
-    protected function _getAuthorizationUrl()
+    protected function getAuthorizationUrl()
     {
-        return $this->_getProvider()->getAuthorizationUrl(array(
-            'scope' => 'https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
-        ));
+        return $this->getProvider()->getAuthorizationUrl([
+            'scope' => implode(' ', [
+                'https://www.googleapis.com/auth/plus.me',
+                'https://www.googleapis.com/auth/userinfo.email',
+                'https://www.googleapis.com/auth/userinfo.profile'
+            ]),
+        ]);
     }
 
-    protected function _getFriendsAuthorizationUrl()
+    protected function getFriendsAuthorizationUrl()
     {
         throw new Exception("Not implemented");
     }
@@ -41,9 +45,9 @@ class GooglePlus extends LeagueOAuth2
      */
     public function getData(array $options)
     {
-        $provider = $this->_getProvider();
+        $provider = $this->getProvider();
 
-        $ownerDetails = $provider->getResourceOwner($this->_accessToken);
+        $ownerDetails = $provider->getResourceOwner($this->accessToken);
 
         $ownerDetailsArray = $ownerDetails->toArray();
 

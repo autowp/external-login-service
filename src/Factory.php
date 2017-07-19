@@ -12,11 +12,11 @@ class Factory
     /**
      * @var array
      */
-    private $_options;
+    private $options;
 
     public function __construct(array $options)
     {
-        $this->_options = $options;
+        $this->options = $options;
     }
 
     /**
@@ -27,7 +27,7 @@ class Factory
     public function getService($service, $optionsKey, array $options)
     {
         $service = trim($service);
-        if (!isset($this->_options[$optionsKey])) {
+        if (! isset($this->options[$optionsKey])) {
             throw new Exception("Service '$optionsKey' options not found");
         }
 
@@ -35,10 +35,10 @@ class Factory
 
         $className = 'Autowp\\ExternalLoginService\\' . ucfirst($filter->filter($service));
 
-        $serviceOptions = array_replace($this->_options[$optionsKey], $options);
+        $serviceOptions = array_replace($this->options[$optionsKey], $options);
         $serviceObj = new $className($serviceOptions);
 
-        if (!$serviceObj instanceof AbstractService) {
+        if (! $serviceObj instanceof AbstractService) {
             throw new Exception("'$className' is not AbstractService");
         }
 
@@ -47,10 +47,10 @@ class Factory
 
     public function getCallbackUrl()
     {
-        if (!isset($this->_options['callback'])) {
+        if (! isset($this->options['callback'])) {
             throw new Exception('`callback` not set');
         }
 
-        return $this->_options['callback'];
+        return $this->options['callback'];
     }
 }

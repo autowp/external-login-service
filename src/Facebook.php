@@ -14,40 +14,40 @@ use Zend\Json\Json;
 
 class Facebook extends LeagueOAuth2
 {
-    private $_graphApiVersion = 'v2.5';
+    private $graphApiVersion = 'v2.5';
 
     private $defaultScope = ['public_profile', 'user_friends', 'user_hometown'];
 
-    protected function _createProvider()
+    protected function createProvider()
     {
         return new FacebookProvider([
-            'clientId'        => $this->_options['clientId'],
-            'clientSecret'    => $this->_options['clientSecret'],
-            'redirectUri'     => isset($this->_options['redirect_uri']) ? $this->_options['redirect_uri'] : null,
-            'graphApiVersion' => $this->_graphApiVersion,
+            'clientId'        => $this->options['clientId'],
+            'clientSecret'    => $this->options['clientSecret'],
+            'redirectUri'     => isset($this->options['redirect_uri']) ? $this->options['redirect_uri'] : null,
+            'graphApiVersion' => $this->graphApiVersion,
         ]);
     }
 
     private function getScope()
     {
         $scope = $this->defaultScope;
-        if (isset($this->_options['scope']) && is_array($this->_options['scope'])) {
-            $scope = $this->_options['scope'];
+        if (isset($this->options['scope']) && is_array($this->options['scope'])) {
+            $scope = $this->options['scope'];
         }
 
         return $scope;
     }
 
-    protected function _getAuthorizationUrl()
+    protected function getAuthorizationUrl()
     {
-        return $this->_getProvider()->getAuthorizationUrl([
+        return $this->getProvider()->getAuthorizationUrl([
             'scope' => $this->getScope()
         ]);
     }
 
-    protected function _getFriendsAuthorizationUrl()
+    protected function getFriendsAuthorizationUrl()
     {
-        return $this->_getProvider()->getAuthorizationUrl([
+        return $this->getProvider()->getAuthorizationUrl([
             'scope' => $this->getScope()
         ]);
     }
@@ -55,7 +55,7 @@ class Facebook extends LeagueOAuth2
     /**
      * @var string
      */
-    protected $_imageUrlTemplate =
+    protected $imageUrlTemplate =
         'https://graph.facebook.com/%s/picture?type=large';
 
     /**
@@ -75,9 +75,9 @@ class Facebook extends LeagueOAuth2
      */
     public function getData(array $options)
     {
-        $provider = $this->_getProvider();
+        $provider = $this->getProvider();
 
-        $ownerDetails = $provider->getResourceOwner($this->_accessToken);
+        $ownerDetails = $provider->getResourceOwner($this->accessToken);
 
         $json = $ownerDetails->toArray();
 
@@ -94,7 +94,7 @@ class Facebook extends LeagueOAuth2
         ];
         if (isset($json['id']) && $json['id']) {
             $data['externalId'] = $json['id'];
-            $data['photoUrl'] = sprintf($this->_imageUrlTemplate, $json['id']);
+            $data['photoUrl'] = sprintf($this->imageUrlTemplate, $json['id']);
         }
         if (isset($json['name']) && $json['name']) {
             $data['name'] = $json['name'];
@@ -130,22 +130,19 @@ class Facebook extends LeagueOAuth2
 
     public function getFriends()
     {
-        $provider = $this->_getProvider();
-
-        if (!$this->_accessToken) {
+        if (! $this->accessToken) {
             throw new Exception("Access token not provided");
         }
 
         $limit = 1000;
-        $url = 'https://graph.facebook.com/' . $this->_graphApiVersion . '/me/friends?' . http_build_query([
+        $url = 'https://graph.facebook.com/' . $this->graphApiVersion . '/me/friends?' . http_build_query([
             'limit'        => $limit,
             'offset'       => 0,
-            'access_token' => $this->_accessToken->getToken()
+            'access_token' => $this->accessToken->getToken()
         ]);
 
-        $friendsId = array();
+        $friendsId = [];
         while (true) {
-
             $response = file_get_contents($url);
             try {
                 $response = Json::decode($response);
@@ -155,11 +152,13 @@ class Facebook extends LeagueOAuth2
 
             if ($response) {
                 if (isset($response->data) && is_array($response->data)) {
-                    foreach ($response->data as $key => $value) {
+                    foreach ($response->data as $value) {
                         $friendsId[] = (string)$value->id;
                     }
                 }
-                if (count($friendsId) == 0) break;
+                if (count($friendsId) == 0) {
+                    break;
+                }
                 if (count($friendsId) == $limit && isset($response->paging->next)) {
                     $url = $response->paging->next;
                 } else {

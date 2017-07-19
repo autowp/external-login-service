@@ -16,7 +16,7 @@ class ResultTest extends TestCase
 
     public function testBasicCorect()
     {
-        $data = array(
+        $data = [
             'externalId' => '123',
             'name'       => 'Ivanov Ivan',
             'profileUrl' => null,
@@ -26,7 +26,7 @@ class ResultTest extends TestCase
             'location'   => null,
             'gender'     => null,
             'language'   => null
-        );
+        ];
 
         $result = new Result($data);
 
@@ -38,7 +38,7 @@ class ResultTest extends TestCase
      */
     public function testIncorrectPhotoUriThrowsException()
     {
-        $result = new Result(array(
+        new Result([
             'externalId' => '123',
             'name'       => 'Ivanov Ivan',
             'profileUrl' => null,
@@ -48,7 +48,7 @@ class ResultTest extends TestCase
             'location'   => null,
             'gender'     => null,
             'language'   => null
-        ));
+        ]);
     }
 
     /**
@@ -56,7 +56,7 @@ class ResultTest extends TestCase
      */
     public function testIncorrectEmailThrowsException()
     {
-        $result = new Result(array(
+        new Result([
             'externalId' => '123',
             'name'       => 'Ivanov Ivan',
             'profileUrl' => null,
@@ -66,6 +66,6 @@ class ResultTest extends TestCase
             'location'   => null,
             'gender'     => null,
             'language'   => null
-        ));
+        ]);
     }
 }

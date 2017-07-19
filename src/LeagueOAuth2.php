@@ -12,72 +12,72 @@ abstract class LeagueOAuth2 extends AbstractService
     /**
      * @var AbstractProvider
      */
-    protected $_provider;
+    protected $provider;
 
     /**
      * @var string
      */
-    protected $_accessToken;
+    protected $accessToken;
 
     /**
      * @return AbstractProvider
      */
-    abstract protected function _createProvider();
+    abstract protected function createProvider();
 
     /**
      * @return AbstractProvider
      */
-    protected function _getProvider()
+    protected function getProvider()
     {
-        if (!$this->_provider) {
-            $this->_provider = $this->_createProvider();
+        if (! $this->provider) {
+            $this->provider = $this->createProvider();
         }
 
-        return $this->_provider;
+        return $this->provider;
     }
 
     /**
      * @return string
      */
-    abstract protected function _getAuthorizationUrl();
+    abstract protected function getAuthorizationUrl();
 
     /**
      * @return string
      */
-    abstract protected function _getFriendsAuthorizationUrl();
+    abstract protected function getFriendsAuthorizationUrl();
 
     public function getState()
     {
-        return $this->_getProvider()->getState();
+        return $this->getProvider()->getState();
     }
 
     public function getLoginUrl()
     {
-        return $this->_getAuthorizationUrl();
+        return $this->getAuthorizationUrl();
     }
 
     public function getFriendsUrl()
     {
-        return $this->_getFriendsAuthorizationUrl();
+        return $this->getFriendsAuthorizationUrl();
     }
 
     public function callback(array $params)
     {
-        $provider = $this->_getProvider();
+        $provider = $this->getProvider();
 
-        $this->_accessToken = $provider->getAccessToken('authorization_code', [
+        $this->accessToken = $provider->getAccessToken('authorization_code', [
             'code' => $params['code']
         ]);
 
-        return $this->_accessToken;
+        return $this->accessToken;
     }
-    
+
     public function setAccessToken($accessToken)
     {
-        $this->_accessToken = new AccessToken([
+        $this->accessToken = new AccessToken([
             'access_token' => $accessToken
         ]);
-        
+
         return $this;
     }
 }

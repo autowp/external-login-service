@@ -10,6 +10,8 @@ matrix:
 before_script: composer install --dev
 
 script:
+- ./composer.phar cs-check
+- ./composer.phar phpmd
 - ./vendor/bin/phpunit --coverage-clover ./test/logs/clover.xml
 
 after_script:

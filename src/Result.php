@@ -59,7 +59,7 @@ class Result
      * @param array $options
      * @throws Exception
      */
-    public function __construct(array $options = array())
+    public function __construct(array $options = [])
     {
         $this->setOptions($options);
     }
@@ -163,7 +163,6 @@ class Result
         $photoUrl = (string)$photoUrl;
 
         if ($photoUrl) {
-
             $validator = new Uri([
                 'allowRelative' => false
             ]);
@@ -197,7 +196,6 @@ class Result
         $email = (string)$email;
 
         if ($email) {
-
             $validator = new EmailAddress();
 
             if ($validator->isValid($email)) {
@@ -268,7 +266,7 @@ class Result
 
         return $this;
     }
-    
+
     /**
      * @return string $location
      */
