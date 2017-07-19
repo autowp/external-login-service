@@ -10,10 +10,9 @@ engines:
     enabled: true
   phpmd:
     enabled: true
-    checks:
-      Naming/ShortVariable:
-        enabled: false
-        exceptions: id, db
+    checks
+      CleanCode/StaticAccess:
+        enabled: false:
   phpcodesniffer:
     enabled: true
   phan:
