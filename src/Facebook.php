@@ -2,13 +2,8 @@
 
 namespace Autowp\ExternalLoginService;
 
-use Autowp\ExternalLoginService\Exception;
-use Autowp\ExternalLoginService\LeagueOAuth2;
-use Autowp\ExternalLoginService\Result;
-
-use Autowp\ExternalLoginService\Provider\Facebook as FacebookProvider;
-
 use DateTime;
+use Locale;
 
 use Zend\Json\Json;
 
@@ -20,7 +15,7 @@ class Facebook extends LeagueOAuth2
 
     protected function createProvider()
     {
-        return new FacebookProvider([
+        return new Provider\Facebook([
             'clientId'        => $this->options['clientId'],
             'clientSecret'    => $this->options['clientSecret'],
             'redirectUri'     => isset($this->options['redirect_uri']) ? $this->options['redirect_uri'] : null,
@@ -111,19 +106,14 @@ class Facebook extends LeagueOAuth2
         if (isset($json['gender']) && $json['gender']) {
             $data['gender'] = $json['gender'];
         }
-        if (isset($json['location']) && $json['location']) {
-            if (isset($json['location']['name']) && $json['location']['name']) {
-                $data['location'] = $json['location']['name'];
-            }
+        if (isset($json['location']['name']) && $json['location']['name']) {
+            $data['location'] = $json['location']['name'];
         }
-        if (isset($json['hometown']) && $json['hometown']) {
-            if (isset($json['hometown']['name']) && $json['hometown']['name']) {
-                $data['location'] = $json['hometown']['name'];
-            }
+        if (isset($json['hometown']['name']) && $json['hometown']['name']) {
+            $data['location'] = $json['hometown']['name'];
         }
-
         if (isset($json['locale']) && $json['locale']) {
-            $data['language'] = \Locale::getPrimaryLanguage($json['locale']);
+            $data['language'] = Locale::getPrimaryLanguage($json['locale']);
         }
         return new Result($data);
     }
@@ -150,24 +140,22 @@ class Facebook extends LeagueOAuth2
                 $response = null;
             }
 
-            if ($response) {
-                if (isset($response->data) && is_array($response->data)) {
-                    foreach ($response->data as $value) {
-                        $friendsId[] = (string)$value->id;
-                    }
-                }
-                if (count($friendsId) == 0) {
-                    break;
-                }
-                if (count($friendsId) == $limit && isset($response->paging->next)) {
-                    $url = $response->paging->next;
-                } else {
-                    break;
-                }
-            } else {
-                $message = 'Error requesting data';
-                throw new Exception($message);
+            if (! $response) {
+                throw new Exception('Error requesting data');
             }
+
+            if (isset($response->data) && is_array($response->data)) {
+                foreach ($response->data as $value) {
+                    $friendsId[] = (string)$value->id;
+                }
+            }
+            if (count($friendsId) == 0) {
+                break;
+            }
+            if (count($friendsId) != $limit || ! isset($response->paging->next)) {
+                break;
+            }
+            $url = $response->paging->next;
         }
         return $friendsId;
     }

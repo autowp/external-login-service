@@ -74,12 +74,10 @@ class Result
         foreach ($options as $key => $value) {
             $method = 'set' . ucfirst($key);
 
-            if (method_exists($this, $method)) {
-                $this->$method($value);
-            } else {
-                $message = "Unexpected option '$key'";
-                throw new Exception($message);
+            if (! method_exists($this, $method)) {
+                throw new Exception("Unexpected option '$key'");
             }
+            $this->$method($value);
         }
 
         return $this;
@@ -129,6 +127,8 @@ class Result
      */
     public function setProfileUrl($profileUrl)
     {
+        $this->profileUrl = null;
+
         $profileUrl = (string)$profileUrl;
 
         if ($profileUrl) {
@@ -139,8 +139,6 @@ class Result
                 $message = "Invalid profile url `$profileUrl`";
                 throw new Exception($message);
             }*/
-        } else {
-            $this->profileUrl = null;
         }
 
         return $this;
@@ -160,6 +158,8 @@ class Result
      */
     public function setPhotoUrl($photoUrl)
     {
+        $this->photoUrl = null;
+
         $photoUrl = (string)$photoUrl;
 
         if ($photoUrl) {
@@ -167,13 +167,11 @@ class Result
                 'allowRelative' => false
             ]);
 
-            if ($validator->isValid($photoUrl)) {
-                $this->photoUrl = $photoUrl;
-            } else {
+            if (! $validator->isValid($photoUrl)) {
                 throw new InvalidUriException("Invalid profile url `$photoUrl`");
             }
-        } else {
-            $this->photoUrl = null;
+
+            $this->photoUrl = $photoUrl;
         }
 
         return $this;
@@ -193,18 +191,18 @@ class Result
      */
     public function setEmail($email)
     {
+        $this->email = null;
+
         $email = (string)$email;
 
         if ($email) {
             $validator = new EmailAddress();
 
-            if ($validator->isValid($email)) {
-                $this->email = $email;
-            } else {
+            if (! $validator->isValid($email)) {
                 throw new InvalidEmailAddressException("Invalid e-mail `$email`");
             }
-        } else {
-            $this->email = null;
+
+            $this->email = $email;
         }
 
         return $this;
