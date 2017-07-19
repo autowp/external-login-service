@@ -36,6 +36,11 @@ abstract class LeagueOAuth2 extends AbstractService
         return $this->provider;
     }
 
+    public function setProvider(AbstractProvider $provider)
+    {
+        $this->provider = $provider;
+    }
+
     /**
      * @return string
      */

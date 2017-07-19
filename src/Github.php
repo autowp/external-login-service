@@ -15,7 +15,7 @@ class Github extends LeagueOAuth2
         return new GithubProvider([
             'clientId'     => $this->options['clientId'],
             'clientSecret' => $this->options['clientSecret'],
-            'redirectUri'  => $this->options['redirect_uri']
+            'redirectUri'  => $this->options['redirectUri']
         ]);
     }
 

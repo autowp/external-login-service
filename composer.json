@@ -15,7 +15,6 @@
         "ext-intl": "*",
         "ext-json": "*",
         "zendframework/zend-session": "*",
-        "zendframework/zend-filter": ">=2.7",
         "zendframework/zend-uri": "*",
         "league/oauth1-client": "*",
         "league/oauth2-client": "^2.2",
@@ -26,14 +25,16 @@
         "league/oauth2-linkedin": "^2.0",
         "zendframework/zend-validator": ">=2.6",
         "zendframework/zend-json": ">=2.6",
-        "j4k/oauth2-vkontakte": ">=1.1.2"
+        "j4k/oauth2-vkontakte": ">=1.1.2",
+        "zendframework/zend-servicemanager": "^3.3"
     },
     "require-dev": {
         "phpunit/PHPUnit": "^6.0",
         "satooshi/php-coveralls": "^1.0",
         "codeclimate/php-test-reporter": "dev-master",
         "zendframework/zend-coding-standard": "~1.0.0",
-        "phpmd/phpmd": "^2.6"
+        "phpmd/phpmd": "^2.6",
+        "zendframework/zend-test": "^3.1"
     },
     "autoload": {
         "psr-4": {
