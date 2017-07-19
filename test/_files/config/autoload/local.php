@@ -25,6 +25,11 @@ return [
             'clientId'        => 'xxxx',
             'clientSecret'    => 'yyyy',
             'redirectUri'     => 'http://example.com/',
+        ],
+        Vk::class => [
+            'clientId'        => 'xxxx',
+            'clientSecret'    => 'yyyy',
+            'redirectUri'     => 'http://example.com/',
         ]
     ]
 ];

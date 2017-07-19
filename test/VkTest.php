@@ -2,15 +2,15 @@
 
 namespace AutowpTest\ExternalLoginService;
 
+use J4k\OAuth2\Client\Provider\VkontakteUser;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
-use League\OAuth2\Client\Provider\LinkedInResourceOwner;
 use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 
-use Autowp\ExternalLoginService\Linkedin;
+use Autowp\ExternalLoginService\Vk;
 use Autowp\ExternalLoginService\PluginManager;
 use Autowp\ExternalLoginService\Result;
 
-class LinkedInTest extends AbstractHttpControllerTestCase
+class VkTest extends AbstractHttpControllerTestCase
 {
     protected $appConfigPath = __DIR__ . '/_files/config/application.config.php';
 
@@ -32,12 +32,12 @@ class LinkedInTest extends AbstractHttpControllerTestCase
             ->getMock();
 
         $providerMock->method('getResourceOwner')->willReturnCallback(function () {
-            return new LinkedInResourceOwner([
-                'id'               => 'user_id',
-                'firstName'        => 'User',
-                'lastName'         => 'Name',
-                'publicProfileUrl' => 'http://example.com/user_id',
-                'pictureUrl'       => 'http://example.com/user_id.jpg'
+            return new VkontakteUser([
+                'id'             => 'user_id',
+                'first_name'     => 'User',
+                'last_name'      => 'Name',
+                'screen_name'    => 'user_id',
+                'photo_max_orig' => 'http://example.com/user_id.jpg'
             ]);
         });
 
@@ -47,7 +47,7 @@ class LinkedInTest extends AbstractHttpControllerTestCase
     }
 
     /**
-     * @return Linkedin
+     * @return Vk
      */
     private function getService()
     {
@@ -55,9 +55,9 @@ class LinkedInTest extends AbstractHttpControllerTestCase
 
         $this->assertInstanceOf(PluginManager::class, $manager);
 
-        $service = $manager->get('linked-in');
+        $service = $manager->get('vk');
 
-        $this->assertInstanceOf(Linkedin::class, $service);
+        $this->assertInstanceOf(Vk::class, $service);
 
         return $service;
     }
@@ -69,9 +69,10 @@ class LinkedInTest extends AbstractHttpControllerTestCase
         $loginUrl = $service->getLoginUrl();
 
         $this->assertRegExp(
-            '|https://www\.linkedin\.com/uas/oauth2/authorization' .
-                '\?state=[a-z0-9]+&scope=&response_type=code&approval_prompt=auto' .
-                '&redirect_uri=http%3A%2F%2Fexample\.com%2F&client_id=xxxx|iu',
+            '|https://oauth\.vk\.com/authorize' .
+                '\?state=[a-z0-9]+&scope=status&response_type=code' .
+                '&approval_prompt=auto&redirect_uri=http%3A%2F%2Fexample.com%2F' .
+                '&client_id=xxxx|iu',
             $loginUrl
         );
     }
@@ -99,7 +100,7 @@ class LinkedInTest extends AbstractHttpControllerTestCase
         $this->assertInstanceOf(Result::class, $data);
         $this->assertEquals('User Name', $data->getName());
         $this->assertEquals('user_id', $data->getExternalId());
-        $this->assertEquals('http://example.com/user_id', $data->getProfileUrl());
+        $this->assertEquals('http://vk.com/user_id', $data->getProfileUrl());
         $this->assertEquals('http://example.com/user_id.jpg', $data->getPhotoUrl());
     }
 }

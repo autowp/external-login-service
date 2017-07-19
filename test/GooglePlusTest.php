@@ -28,9 +28,7 @@ class GooglePlusTest extends AbstractHttpControllerTestCase
     private function mockProvider()
     {
         $providerMock = $this->getMockBuilder(\League\OAuth2\Client\Provider\Google::class)
-            ->setConstructorArgs([[
-                'graphApiVersion' => 'v2.10'
-            ]])
+            ->setConstructorArgs([[]])
             ->getMock();
 
         $providerMock->method('getResourceOwner')->willReturnCallback(function () {
