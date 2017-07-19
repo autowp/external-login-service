@@ -20,6 +20,11 @@ return [
             'clientId'        => 'xxxx',
             'clientSecret'    => 'yyyy',
             'redirectUri'     => 'http://example.com/',
+        ],
+        Linkedin::class => [
+            'clientId'        => 'xxxx',
+            'clientSecret'    => 'yyyy',
+            'redirectUri'     => 'http://example.com/',
         ]
     ]
 ];

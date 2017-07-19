@@ -15,7 +15,7 @@ class Linkedin extends LeagueOAuth2
         return new LinkedInProvider([
             'clientId'     => $this->options['clientId'],
             'clientSecret' => $this->options['clientSecret'],
-            'redirectUri'  => $this->options['redirect_uri']
+            'redirectUri'  => $this->options['redirectUri']
         ]);
     }
 

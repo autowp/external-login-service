@@ -16,7 +16,7 @@ class Facebook extends LeagueOAuth2
         return new Provider\Facebook([
             'clientId'        => $this->options['clientId'],
             'clientSecret'    => $this->options['clientSecret'],
-            'redirectUri'     => isset($this->options['redirect_uri']) ? $this->options['redirect_uri'] : null,
+            'redirectUri'     => isset($this->options['redirectUri']) ? $this->options['redirectUri'] : null,
             'graphApiVersion' => $this->options['graphApiVersion'],
         ]);
     }

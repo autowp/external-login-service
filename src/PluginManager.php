@@ -12,6 +12,7 @@ class PluginManager extends AbstractPluginManager
         'google-plus' => GooglePlus::class,
         'googleplus'  => GooglePlus::class,
         'linkedin'    => Linkedin::class,
+        'linked-in'   => Linkedin::class,
         'twitter'     => Twitter::class,
         'vk'          => Vk::class,
     ];
