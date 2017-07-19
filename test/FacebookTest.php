@@ -70,7 +70,7 @@ class FacebookTest extends AbstractHttpControllerTestCase
 
         $this->assertRegExp(
             '|https://www\.facebook\.com/v2\.10/dialog/oauth' .
-                '\?scope=public_profile%2Cuser_friends&state=[a-z0-9]+&' . 
+                '\?scope=public_profile%2Cuser_friends&state=[a-z0-9]+&' .
                 'response_type=code&approval_prompt=auto&client_id=xxxx|iu',
             $loginUrl
         );
