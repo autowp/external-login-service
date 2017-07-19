@@ -2,6 +2,8 @@
 
 namespace AutowpTest\ExternalLoginService;
 
+use PHPUnit\Framework\TestCase;
+
 use Autowp\ExternalLoginService\Factory;
 use Autowp\ExternalLoginService\Facebook;
 use Autowp\ExternalLoginService\Github;
@@ -13,7 +15,7 @@ use Autowp\ExternalLoginService\Vk;
 /**
  * @group Autowp_ExternalLoginService
  */
-class FactoryTest extends \PHPUnit_Framework_TestCase
+class FactoryTest extends TestCase
 {
     
     public function testServicesExists()

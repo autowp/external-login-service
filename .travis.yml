@@ -1,8 +1,13 @@
 language: php
 php:
-  - '5.5'
-  - '5.6'
   - '7.0'
-  - hhvm
+  - '7.1'
   - nightly
 before_script: composer install --dev
+
+script:
+- ./vendor/bin/phpunit --coverage-clover ./test/logs/clover.xml
+
+after_script:
+- ./vendor/bin/coveralls -v
+- ./vendor/bin/test-reporter -v --coverage-report=./test/logs/clover.xml

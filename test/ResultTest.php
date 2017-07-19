@@ -2,14 +2,16 @@
 
 namespace AutowpTest\ExternalLoginService;
 
-use Autowp\ExternalLoginService\Result;
-
 use DateTime;
+
+use PHPUnit\Framework\TestCase;
+
+use Autowp\ExternalLoginService\Result;
 
 /**
  * @group Autowp_ExternalLoginService
  */
-class ResultTest extends \PHPUnit_Framework_TestCase
+class ResultTest extends TestCase
 {
 
     public function testBasicCorect()

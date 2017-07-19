@@ -29,7 +29,7 @@
         "j4k/oauth2-vkontakte": "*"
     },
     "require-dev": {
-        "phpunit/PHPUnit": "~4.0"
+        "phpunit/PHPUnit": "^6.0"
     },
     "autoload": {
         "psr-4": {
