@@ -9,8 +9,6 @@ use Zend\Json\Json;
 
 class Facebook extends LeagueOAuth2
 {
-    private $graphApiVersion = 'v2.5';
-
     private $defaultScope = ['public_profile', 'user_friends', 'user_hometown'];
 
     protected function createProvider()
@@ -19,7 +17,7 @@ class Facebook extends LeagueOAuth2
             'clientId'        => $this->options['clientId'],
             'clientSecret'    => $this->options['clientSecret'],
             'redirectUri'     => isset($this->options['redirect_uri']) ? $this->options['redirect_uri'] : null,
-            'graphApiVersion' => $this->graphApiVersion,
+            'graphApiVersion' => $this->options['graphApiVersion'],
         ]);
     }
 
@@ -127,7 +125,7 @@ class Facebook extends LeagueOAuth2
         }
 
         $limit = 1000;
-        $url = 'https://graph.facebook.com/' . $this->graphApiVersion . '/me/friends?' . http_build_query([
+        $url = 'https://graph.facebook.com/' . $this->options['graphApiVersion']. '/me/friends?' . http_build_query([
             'limit'        => $limit,
             'offset'       => 0,
             'access_token' => $this->accessToken->getToken()

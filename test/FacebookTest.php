@@ -2,15 +2,15 @@
 
 namespace AutowpTest\ExternalLoginService;
 
-use League\OAuth2\Client\Provider\GithubResourceOwner;
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use League\OAuth2\Client\Provider\FacebookUser;
 use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 
-use Autowp\ExternalLoginService\Github;
+use Autowp\ExternalLoginService\Facebook;
 use Autowp\ExternalLoginService\PluginManager;
 use Autowp\ExternalLoginService\Result;
-use League\OAuth2\Client\Provider\Exception\GithubIdentityProviderException;
 
-class GithubTest extends AbstractHttpControllerTestCase
+class FacebookTest extends AbstractHttpControllerTestCase
 {
     protected $appConfigPath = __DIR__ . '/_files/config/application.config.php';
 
@@ -27,16 +27,17 @@ class GithubTest extends AbstractHttpControllerTestCase
 
     private function mockProvider()
     {
-        $providerMock = $this->getMockBuilder(\League\OAuth2\Client\Provider\Github::class)
-            ->setConstructorArgs([[]])
+        $providerMock = $this->getMockBuilder(\Autowp\ExternalLoginService\Provider\Facebook::class)
+            ->setConstructorArgs([[
+                'graphApiVersion' => 'v2.10'
+            ]])
             ->getMock();
 
         $providerMock->method('getResourceOwner')->willReturnCallback(function () {
-            return new GithubResourceOwner([
+            return new FacebookUser([
                 'id'         => 'user_id',
                 'name'       => 'UserName',
-                'html_url'   => 'http://example.com/user_id',
-                'avatar_url' => 'http://example.com/user_id.jpg'
+                'link'       => 'http://example.com/user_id'
             ]);
         });
 
@@ -46,7 +47,7 @@ class GithubTest extends AbstractHttpControllerTestCase
     }
 
     /**
-     * @return Github
+     * @return Facebook
      */
     private function getService()
     {
@@ -54,9 +55,9 @@ class GithubTest extends AbstractHttpControllerTestCase
 
         $this->assertInstanceOf(PluginManager::class, $manager);
 
-        $service = $manager->get('github');
+        $service = $manager->get('facebook');
 
-        $this->assertInstanceOf(Github::class, $service);
+        $this->assertInstanceOf(Facebook::class, $service);
 
         return $service;
     }
@@ -68,16 +69,16 @@ class GithubTest extends AbstractHttpControllerTestCase
         $loginUrl = $service->getLoginUrl();
 
         $this->assertRegExp(
-            '|https://github\.com/login/oauth/authorize\?state=[a-z0-9]+&scope=' .
-                '&response_type=code&approval_prompt=auto' .
-                '&redirect_uri=http%3A%2F%2Fexample\.com%2F&client_id=xxxx|iu',
+            '|https://www\.facebook\.com/v2\.10/dialog/oauth' .
+                '\?scope=public_profile%2Cuser_friends&state=[a-z0-9]+&' . 
+                'response_type=code&approval_prompt=auto&client_id=xxxx|iu',
             $loginUrl
         );
     }
 
     public function testThrowsCredentialRequired()
     {
-        $this->expectException(GithubIdentityProviderException::class);
+        $this->expectException(IdentityProviderException::class);
 
         $service = $this->getService();
 
@@ -99,6 +100,6 @@ class GithubTest extends AbstractHttpControllerTestCase
         $this->assertEquals('UserName', $data->getName());
         $this->assertEquals('user_id', $data->getExternalId());
         $this->assertEquals('http://example.com/user_id', $data->getProfileUrl());
-        $this->assertEquals('http://example.com/user_id.jpg', $data->getPhotoUrl());
+        $this->assertEquals('https://graph.facebook.com/user_id/picture?type=large', $data->getPhotoUrl());
     }
 }
