@@ -18,15 +18,15 @@
         "zendframework/zend-filter": ">=2.7",
         "zendframework/zend-uri": "*",
         "league/oauth1-client": "*",
-        "league/oauth2-client": "^1.1",
-        "league/oauth2-facebook": "^1.1",
-        "league/oauth2-github": "^0.2.0",
-        "league/oauth2-google": "^1.0",
-        "league/oauth2-instagram": "^0.2.1",
-        "league/oauth2-linkedin": "^0.4.0",
+        "league/oauth2-client": "^2.2",
+        "league/oauth2-facebook": "^2.0",
+        "league/oauth2-github": "^2.0",
+        "league/oauth2-google": "^2.0",
+        "league/oauth2-instagram": "^2.0",
+        "league/oauth2-linkedin": "^2.0",
         "zendframework/zend-validator": ">=2.6",
         "zendframework/zend-json": ">=2.6",
-        "j4k/oauth2-vkontakte": "*"
+        "j4k/oauth2-vkontakte": ">=1.1.2"
     },
     "require-dev": {
         "phpunit/PHPUnit": "^6.0",
@@ -55,5 +55,11 @@
         "cs-fix" : "phpcbf --encoding=utf-8",
         "test" : "phpunit --colors=always",
         "phpmd" : "phpmd src,test text ruleset.xml --suffixes php,phtml"
-    }
+    },
+    "repositories" : [
+        {
+            "type" : "git",
+            "url": "https://github.com/autowp/oauth2-vkontakte"
+        }
+    ]
 }
