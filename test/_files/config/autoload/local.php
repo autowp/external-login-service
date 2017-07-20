@@ -26,6 +26,11 @@ return [
             'clientSecret'    => 'yyyy',
             'redirectUri'     => 'http://example.com/',
         ],
+        Twitter::class => [
+            'consumerKey'     => 'xxxx',
+            'consumerSecret'  => 'yyyy',
+            'redirectUri'     => 'http://example.com/',
+        ],
         Vk::class => [
             'clientId'        => 'xxxx',
             'clientSecret'    => 'yyyy',

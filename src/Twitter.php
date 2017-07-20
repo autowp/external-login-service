@@ -6,7 +6,7 @@ use Autowp\ExternalLoginService\Exception;
 use Autowp\ExternalLoginService\AbstractService;
 use Autowp\ExternalLoginService\Result;
 
-use League\OAuth1\Client\Server\Twitter as TwitterServer;
+use League\OAuth1\Client;
 use GuzzleHttp\Exception\BadResponseException;
 
 class Twitter extends AbstractService
@@ -14,32 +14,32 @@ class Twitter extends AbstractService
     /**
      * @var Twitter
      */
-    protected $server = null;
+    private $server = null;
 
     /**
      *
      * @var \Zend\Session\Container
      */
-    protected $session;
+    private $session;
 
     /**
      *
-     * @var Access
+     * @var Client\Credentials\TokenCredentials
      */
-    protected $accessToken = null;
+    private $accessToken = null;
 
     /**
      * @var string
      */
     private $state = null;
 
-    protected function getSession()
+    private function getSession()
     {
         return $this->session ? $this->session : $this->session = new \Zend\Session\Container('Twitter');
     }
 
     /**
-     * @return TwitterServer
+     * @return Client\Server\Twitter
      */
     public function getServer()
     {
@@ -48,14 +48,19 @@ class Twitter extends AbstractService
                 'identifier' => $this->options['consumerKey'],
                 'secret'     => $this->options['consumerSecret']
             ];
-            if (isset($this->options['redirect_uri'])) {
-                $serverOptions['callback_uri'] = $this->options['redirect_uri'];
+            if (isset($this->options['redirectUri'])) {
+                $serverOptions['callback_uri'] = $this->options['redirectUri'];
             }
 
-            $this->server = new TwitterServer($serverOptions);
+            $this->server = new Client\Server\Twitter($serverOptions);
         }
 
         return $this->server;
+    }
+
+    public function setServer(Client\Server\Twitter $server)
+    {
+        $this->server = $server;
     }
 
     public function getState()
@@ -68,7 +73,11 @@ class Twitter extends AbstractService
      */
     public function getLoginUrl()
     {
-        $temporaryCredentials = $this->getServer()->getTemporaryCredentials();
+        //$temporaryCredentials = $this->getServer()->getTemporaryCredentials();
+
+        $temporaryCredentials = new Client\Credentials\TemporaryCredentials();
+        $temporaryCredentials->setIdentifier('temporary_identifier');
+        $temporaryCredentials->setSecret('temporary_secret');
 
         // Store credentials in the session, we'll need them later
         $this->getSession()->temporaryCredentials = $temporaryCredentials;
@@ -207,11 +216,8 @@ class Twitter extends AbstractService
         return $friendsId;
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
-    public function setAccessToken(array $params)
+    public function setAccessToken(Client\Credentials\TokenCredentials $accessToken)
     {
-        throw new \Exception("Not implemented");
+        $this->accessToken = $accessToken;
     }
 }

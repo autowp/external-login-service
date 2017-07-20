@@ -83,7 +83,8 @@ class LinkedInTest extends AbstractHttpControllerTestCase
         $service = $this->getService();
 
         $service->setAccessToken('example_access_token');
-        $service->getData([]);
+        $data = $service->getData([]);
+        var_dump($data);
     }
 
     public function testGetData()
