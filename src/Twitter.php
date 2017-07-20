@@ -73,11 +73,7 @@ class Twitter extends AbstractService
      */
     public function getLoginUrl()
     {
-        //$temporaryCredentials = $this->getServer()->getTemporaryCredentials();
-
-        $temporaryCredentials = new Client\Credentials\TemporaryCredentials();
-        $temporaryCredentials->setIdentifier('temporary_identifier');
-        $temporaryCredentials->setSecret('temporary_secret');
+        $temporaryCredentials = $this->getServer()->getTemporaryCredentials();
 
         // Store credentials in the session, we'll need them later
         $this->getSession()->temporaryCredentials = $temporaryCredentials;
