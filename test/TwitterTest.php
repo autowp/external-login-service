@@ -97,8 +97,8 @@ class TwitterTest extends AbstractHttpControllerTestCase
         $this->assertNotEmpty($url);
 
         $this->assertRegExp(
-            '|https://api\.twitter\.com/oauth/authenticate' .
-                '\?oauth_token=temporary_identifier|iu',
+            '|^https://api\.twitter\.com/oauth/authenticate' .
+                '\?oauth_token=temporary_identifier$|iu',
             $url
         );
     }
@@ -112,8 +112,8 @@ class TwitterTest extends AbstractHttpControllerTestCase
         $url = $service->getFriendsUrl();
 
         $this->assertRegExp(
-            '|https://api\.twitter\.com/oauth/authenticate' .
-                '\?oauth_token=temporary_identifier|iu',
+            '|^https://api\.twitter\.com/oauth/authenticate' .
+                '\?oauth_token=temporary_identifier$|iu',
             $url
         );
     }

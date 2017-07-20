@@ -78,13 +78,13 @@ class GooglePlusTest extends AbstractHttpControllerTestCase
         $url = $service->getLoginUrl();
 
         $this->assertRegExp(
-            '|https://accounts\.google\.com/o/oauth2/auth' .
+            '|^https://accounts\.google\.com/o/oauth2/auth' .
                 '\?scope='.
                     'https%3A%2F%2Fwww\.googleapis\.com%2Fauth%2Fplus\.me%20' .
                     'https%3A%2F%2Fwww\.googleapis\.com%2Fauth%2Fuserinfo\.email%20'.
                     'https%3A%2F%2Fwww\.googleapis\.com%2Fauth%2Fuserinfo\.profile' .
                 '&state=[a-z0-9]+&response_type=code&approval_prompt=auto' .
-                '&redirect_uri=http%3A%2F%2Fexample.com%2F&client_id=xxxx&authuser=-1|iu',
+                '&redirect_uri=http%3A%2F%2Fexample.com%2Fcallback&client_id=xxxx&authuser=-1$|iu',
             $url
         );
     }

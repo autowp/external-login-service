@@ -76,10 +76,10 @@ class VkTest extends AbstractHttpControllerTestCase
         $url = $service->getLoginUrl();
 
         $this->assertRegExp(
-            '|https://oauth\.vk\.com/authorize' .
+            '|^https://oauth\.vk\.com/authorize' .
                 '\?state=[a-z0-9]+&scope=status&response_type=code' .
-                '&approval_prompt=auto&redirect_uri=http%3A%2F%2Fexample.com%2F' .
-                '&client_id=xxxx|iu',
+                '&approval_prompt=auto&redirect_uri=http%3A%2F%2Fexample.com%2Fcallback' .
+                '&client_id=xxxx$|iu',
             $url
         );
     }

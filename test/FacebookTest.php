@@ -75,10 +75,10 @@ class FacebookTest extends AbstractHttpControllerTestCase
         $url = $service->getLoginUrl();
 
         $this->assertRegExp(
-            '|https://www\.facebook\.com/v2\.10/dialog/oauth' .
+            '|^https://www\.facebook\.com/v2\.10/dialog/oauth' .
                 '\?scope=public_profile%2Cuser_friends&state=[a-z0-9]+&' .
                 'response_type=code&approval_prompt=auto' .
-                '&redirect_uri=http%3A%2F%2Fexample.com%2F&client_id=xxxx|iu',
+                '&redirect_uri=http%3A%2F%2Fexample.com%2Fcallback&client_id=xxxx$|iu',
             $url
         );
     }
@@ -90,10 +90,10 @@ class FacebookTest extends AbstractHttpControllerTestCase
         $url = $service->getFriendsUrl();
 
         $this->assertRegExp(
-            '|https://www\.facebook\.com/v2\.10/dialog/oauth' .
+            '|^https://www\.facebook\.com/v2\.10/dialog/oauth' .
                 '\?scope=public_profile%2Cuser_friends&state=[a-z0-9]+&' .
                 'response_type=code&approval_prompt=auto' .
-                '&redirect_uri=http%3A%2F%2Fexample.com%2F&client_id=xxxx|iu',
+                '&redirect_uri=http%3A%2F%2Fexample.com%2Fcallback&client_id=xxxx$|iu',
             $url
         );
     }

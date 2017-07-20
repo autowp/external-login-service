@@ -19,6 +19,12 @@ class LoginServiceFactory implements FactoryInterface
         if (! isset($config['external_login_services'][$name])) {
             throw new Exception("Config for `$name` not found");
         }
-        return new $name($config['external_login_services'][$name]);
+
+        $params = $config['external_login_services'][$name];
+        if (is_array($options)) {
+            $params = array_replace($params, $options);
+        }
+
+        return new $name($params);
     }
 }
