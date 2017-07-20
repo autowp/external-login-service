@@ -75,7 +75,7 @@ class GooglePlusTest extends AbstractHttpControllerTestCase
     {
         $service = $this->getService();
 
-        $loginUrl = $service->getLoginUrl();
+        $url = $service->getLoginUrl();
 
         $this->assertRegExp(
             '|https://accounts\.google\.com/o/oauth2/auth' .
@@ -85,8 +85,17 @@ class GooglePlusTest extends AbstractHttpControllerTestCase
                     'https%3A%2F%2Fwww\.googleapis\.com%2Fauth%2Fuserinfo\.profile' .
                 '&state=[a-z0-9]+&response_type=code&approval_prompt=auto' .
                 '&redirect_uri=http%3A%2F%2Fexample.com%2F&client_id=xxxx&authuser=-1|iu',
-            $loginUrl
+            $url
         );
+    }
+
+    public function testFriendsUrl()
+    {
+        $this->expectException(\Exception::class);
+
+        $service = $this->getService();
+
+        $service->getFriendsUrl();
     }
 
     public function testThrowsCredentialRequired()

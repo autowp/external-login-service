@@ -69,19 +69,28 @@ class VkTest extends AbstractHttpControllerTestCase
         return $service;
     }
 
-    public function testUrls()
+    public function testUrl()
     {
         $service = $this->getService();
 
-        $loginUrl = $service->getLoginUrl();
+        $url = $service->getLoginUrl();
 
         $this->assertRegExp(
             '|https://oauth\.vk\.com/authorize' .
                 '\?state=[a-z0-9]+&scope=status&response_type=code' .
                 '&approval_prompt=auto&redirect_uri=http%3A%2F%2Fexample.com%2F' .
                 '&client_id=xxxx|iu',
-            $loginUrl
+            $url
         );
+    }
+
+    public function testFriendsUrl()
+    {
+        $this->expectException(\Exception::class);
+
+        $service = $this->getService();
+
+        $service->getFriendsUrl();
     }
 
     public function testThrowsCredentialRequired()

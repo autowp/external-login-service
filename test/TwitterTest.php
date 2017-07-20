@@ -86,20 +86,35 @@ class TwitterTest extends AbstractHttpControllerTestCase
         return $service;
     }
 
-    public function testUrls()
+    public function testUrl()
     {
         $this->mockProvider();
 
         $service = $this->getService();
 
-        $loginUrl = $service->getLoginUrl();
+        $url = $service->getLoginUrl();
 
-        $this->assertNotEmpty($loginUrl);
+        $this->assertNotEmpty($url);
 
         $this->assertRegExp(
             '|https://api\.twitter\.com/oauth/authenticate' .
                 '\?oauth_token=temporary_identifier|iu',
-            $loginUrl
+            $url
+        );
+    }
+
+    public function testFriendsUrl()
+    {
+        $this->mockProvider();
+
+        $service = $this->getService();
+
+        $url = $service->getFriendsUrl();
+
+        $this->assertRegExp(
+            '|https://api\.twitter\.com/oauth/authenticate' .
+                '\?oauth_token=temporary_identifier|iu',
+            $url
         );
     }
 
