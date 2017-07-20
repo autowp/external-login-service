@@ -27,7 +27,7 @@ class TwitterTest extends AbstractHttpControllerTestCase
     private function mockProvider()
     {
         $serverMock = $this->getMockBuilder(Client\Server\Twitter::class)
-            ->setMethods(['getUserDetails', 'getTemporaryCredentials'])
+            ->setMethods(['getUserDetails', 'getTemporaryCredentials', 'getTokenCredentials'])
             ->setConstructorArgs([[
                 'identifier'   => 'xxxx',
                 'secret'       => 'yyyy',
@@ -56,6 +56,15 @@ class TwitterTest extends AbstractHttpControllerTestCase
             $temporaryCredentials->setIdentifier('temporary_identifier');
             $temporaryCredentials->setSecret('temporary_secret');
             return $temporaryCredentials;
+        });
+
+        $serverMock->method('getTokenCredentials')->willReturnCallback(function () {
+
+            $tokenCredentials = new Client\Credentials\TokenCredentials();
+            $tokenCredentials->setIdentifier('oauth_token');
+            $tokenCredentials->setSecret('oauth_token_secret');
+
+            return $tokenCredentials;
         });
 
         $this->getService()->setServer($serverMock);
@@ -128,5 +137,28 @@ class TwitterTest extends AbstractHttpControllerTestCase
         $this->assertEquals('user_id', $data->getExternalId());
         $this->assertEquals('http://twitter.com/user_id', $data->getProfileUrl());
         $this->assertEquals('http://example.com/user_id.jpg', $data->getPhotoUrl());
+    }
+
+    public function testCallback()
+    {
+        $this->mockProvider();
+
+        $service = $this->getService();
+
+        $session = $service->getSession();
+
+        $temporaryCredentials = new Client\Credentials\TemporaryCredentials();
+        $temporaryCredentials->setIdentifier('temporary_identifier');
+        $temporaryCredentials->setSecret('temporary_secret');
+
+        $session->temporaryCredentials = $temporaryCredentials;
+
+        $accessToken = $service->callback([
+            'oauth_token'    => 'temporary_identifier',
+            'oauth_verifier' => 'zzzz-verifier'
+        ]);
+
+        $this->assertEquals('oauth_token', $accessToken->getIdentifier());
+        $this->assertEquals('oauth_token_secret', $accessToken->getSecret());
     }
 }

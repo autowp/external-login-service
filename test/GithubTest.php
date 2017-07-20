@@ -2,13 +2,12 @@
 
 namespace AutowpTest\ExternalLoginService;
 
-use League\OAuth2\Client\Provider\GithubResourceOwner;
+use League\OAuth2\Client;
 use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 
 use Autowp\ExternalLoginService\Github;
 use Autowp\ExternalLoginService\PluginManager;
 use Autowp\ExternalLoginService\Result;
-use League\OAuth2\Client\Provider\Exception\GithubIdentityProviderException;
 
 class GithubTest extends AbstractHttpControllerTestCase
 {
@@ -28,15 +27,22 @@ class GithubTest extends AbstractHttpControllerTestCase
     private function mockProvider()
     {
         $providerMock = $this->getMockBuilder(\League\OAuth2\Client\Provider\Github::class)
+            ->setMethods(['getResourceOwner', 'getAccessToken'])
             ->setConstructorArgs([[]])
             ->getMock();
 
         $providerMock->method('getResourceOwner')->willReturnCallback(function () {
-            return new GithubResourceOwner([
+            return new Client\Provider\GithubResourceOwner([
                 'id'         => 'user_id',
                 'name'       => 'UserName',
                 'html_url'   => 'http://example.com/user_id',
                 'avatar_url' => 'http://example.com/user_id.jpg'
+            ]);
+        });
+
+        $providerMock->method('getAccessToken')->willReturnCallback(function () {
+            return new Client\Token\AccessToken([
+                'access_token'  => 'returned_access_token'
             ]);
         });
 
@@ -77,7 +83,7 @@ class GithubTest extends AbstractHttpControllerTestCase
 
     public function testThrowsCredentialRequired()
     {
-        $this->expectException(GithubIdentityProviderException::class);
+        $this->expectException(Client\Provider\Exception\GithubIdentityProviderException::class);
 
         $service = $this->getService();
 
@@ -100,5 +106,18 @@ class GithubTest extends AbstractHttpControllerTestCase
         $this->assertEquals('user_id', $data->getExternalId());
         $this->assertEquals('http://example.com/user_id', $data->getProfileUrl());
         $this->assertEquals('http://example.com/user_id.jpg', $data->getPhotoUrl());
+    }
+
+    public function testCallback()
+    {
+        $this->mockProvider();
+
+        $service = $this->getService();
+
+        $accessToken = $service->callback([
+            'code' => 'zzzz'
+        ]);
+
+        $this->assertEquals('returned_access_token', $accessToken);
     }
 }

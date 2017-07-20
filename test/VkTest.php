@@ -3,7 +3,7 @@
 namespace AutowpTest\ExternalLoginService;
 
 use J4k\OAuth2\Client\Provider\VkontakteUser;
-use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use League\OAuth2\Client;
 use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 
 use Autowp\ExternalLoginService\Vk;
@@ -28,6 +28,7 @@ class VkTest extends AbstractHttpControllerTestCase
     private function mockProvider()
     {
         $providerMock = $this->getMockBuilder(\League\OAuth2\Client\Provider\Google::class)
+            ->setMethods(['getResourceOwner', 'getAccessToken'])
             ->setConstructorArgs([[]])
             ->getMock();
 
@@ -38,6 +39,12 @@ class VkTest extends AbstractHttpControllerTestCase
                 'last_name'      => 'Name',
                 'screen_name'    => 'user_id',
                 'photo_max_orig' => 'http://example.com/user_id.jpg'
+            ]);
+        });
+
+        $providerMock->method('getAccessToken')->willReturnCallback(function () {
+            return new Client\Token\AccessToken([
+                'access_token'  => 'returned_access_token'
             ]);
         });
 
@@ -79,7 +86,7 @@ class VkTest extends AbstractHttpControllerTestCase
 
     public function testThrowsCredentialRequired()
     {
-        $this->expectException(IdentityProviderException::class);
+        $this->expectException(Client\Provider\Exception\IdentityProviderException::class);
 
         $service = $this->getService();
 
@@ -102,5 +109,18 @@ class VkTest extends AbstractHttpControllerTestCase
         $this->assertEquals('user_id', $data->getExternalId());
         $this->assertEquals('http://vk.com/user_id', $data->getProfileUrl());
         $this->assertEquals('http://example.com/user_id.jpg', $data->getPhotoUrl());
+    }
+
+    public function testCallback()
+    {
+        $this->mockProvider();
+
+        $service = $this->getService();
+
+        $accessToken = $service->callback([
+            'code' => 'zzzz'
+        ]);
+
+        $this->assertEquals('returned_access_token', $accessToken);
     }
 }

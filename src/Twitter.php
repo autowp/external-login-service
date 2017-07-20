@@ -33,7 +33,7 @@ class Twitter extends AbstractService
      */
     private $state = null;
 
-    private function getSession()
+    public function getSession()
     {
         return $this->session ? $this->session : $this->session = new \Zend\Session\Container('Twitter');
     }
@@ -113,6 +113,10 @@ class Twitter extends AbstractService
     {
         if (isset($params['denied']) && $params['denied']) {
             return false;
+        }
+
+        if (! isset($params['oauth_token'], $params['oauth_verifier'])) {
+            throw new Exception('oauth_token or oauth_verifier not provided');
         }
 
         // Retrieve the temporary credentials we saved before

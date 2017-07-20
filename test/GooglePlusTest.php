@@ -2,8 +2,7 @@
 
 namespace AutowpTest\ExternalLoginService;
 
-use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
-use League\OAuth2\Client\Provider\GoogleUser;
+use League\OAuth2\Client;
 use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 
 use Autowp\ExternalLoginService\GooglePlus;
@@ -28,11 +27,12 @@ class GooglePlusTest extends AbstractHttpControllerTestCase
     private function mockProvider()
     {
         $providerMock = $this->getMockBuilder(\League\OAuth2\Client\Provider\Google::class)
+            ->setMethods(['getResourceOwner', 'getAccessToken'])
             ->setConstructorArgs([[]])
             ->getMock();
 
         $providerMock->method('getResourceOwner')->willReturnCallback(function () {
-            return new GoogleUser([
+            return new Client\Provider\GoogleUser([
                 'id'          => 'user_id',
                 'displayName' => 'UserName',
                 'url'         => 'http://example.com/user_id',
@@ -41,6 +41,12 @@ class GooglePlusTest extends AbstractHttpControllerTestCase
                 ],
                 'gender'      => 'male',
                 'language'    => 'en'
+            ]);
+        });
+
+        $providerMock->method('getAccessToken')->willReturnCallback(function () {
+            return new Client\Token\AccessToken([
+                'access_token'  => 'returned_access_token'
             ]);
         });
 
@@ -85,7 +91,7 @@ class GooglePlusTest extends AbstractHttpControllerTestCase
 
     public function testThrowsCredentialRequired()
     {
-        $this->expectException(IdentityProviderException::class);
+        $this->expectException(Client\Provider\Exception\IdentityProviderException::class);
 
         $service = $this->getService();
 
@@ -108,5 +114,18 @@ class GooglePlusTest extends AbstractHttpControllerTestCase
         $this->assertEquals('user_id', $data->getExternalId());
         $this->assertEquals('http://example.com/user_id', $data->getProfileUrl());
         $this->assertEquals('http://example.com/user_id.jpg', $data->getPhotoUrl());
+    }
+
+    public function testCallback()
+    {
+        $this->mockProvider();
+
+        $service = $this->getService();
+
+        $accessToken = $service->callback([
+            'code' => 'zzzz'
+        ]);
+
+        $this->assertEquals('returned_access_token', $accessToken);
     }
 }
