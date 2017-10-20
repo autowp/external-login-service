@@ -73,7 +73,7 @@ class LinkedInTest extends AbstractHttpControllerTestCase
         $service = $this->getService();
 
         $url = $service->getLoginUrl();
-        
+
         $this->assertRegExp(
             '|^https://www\.linkedin\.com/oauth/oauth2/authorization' .
                 '\?state=[a-z0-9]+&scope=&response_type=code&approval_prompt=auto' .
