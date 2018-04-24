@@ -37,7 +37,7 @@ class GooglePlusTest extends AbstractHttpControllerTestCase
                 'displayName' => 'UserName',
                 'url'         => 'http://example.com/user_id',
                 'image' => [
-                    'url' => 'http://example.com/user_id.jpg'
+                    'url' => 'https://lh5.googleusercontent.com/-mWvVvZRluOA/AAAAAAAAAAI/AAAAAAAAAQg/5ryfV08Nl5U/photo.jpg?sz=50'
                 ],
                 'gender'      => 'male',
                 'language'    => 'en'
@@ -122,7 +122,7 @@ class GooglePlusTest extends AbstractHttpControllerTestCase
         $this->assertEquals('UserName', $data->getName());
         $this->assertEquals('user_id', $data->getExternalId());
         $this->assertEquals('http://example.com/user_id', $data->getProfileUrl());
-        $this->assertEquals('http://example.com/user_id.jpg', $data->getPhotoUrl());
+        $this->assertEquals('https://lh5.googleusercontent.com/-mWvVvZRluOA/AAAAAAAAAAI/AAAAAAAAAQg/5ryfV08Nl5U/photo.jpg', $data->getPhotoUrl());
     }
 
     public function testCallback()

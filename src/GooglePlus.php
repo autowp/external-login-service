@@ -78,11 +78,16 @@ class GooglePlus extends LeagueOAuth2
             $birthday = DateTime::createFromFormat('Y-m-d', $ownerDetailsArray['birthday']);
         }
 
+        $photoUrl = $ownerDetailsArray['image']['url'];
+        if ($photoUrl) {
+            $photoUrl = $this->removeSizeParam($photoUrl);
+        }
+
         return new Result([
             'externalId' => $ownerDetailsArray['id'],
             'name'       => $ownerDetailsArray['displayName'],
             'profileUrl' => $ownerDetailsArray['url'],
-            'photoUrl'   => $ownerDetailsArray['image']['url'],
+            'photoUrl'   => $photoUrl,
             'email'      => $email,
             'gender'     => $ownerDetailsArray['gender'],
             'language'   => $ownerDetailsArray['language'],
@@ -99,5 +104,20 @@ class GooglePlus extends LeagueOAuth2
     public function getFriends()
     {
         throw new Exception("Not implemented");
+    }
+
+    private function removeSizeParam(string $url)
+    {
+        $uri = \Zend\Uri\UriFactory::factory($url);
+
+        if ($uri instanceof \Zend\Uri\Http) {
+            $params = $uri->getQueryAsArray();
+            unset($params['sz']);
+            $uri->setQuery($params);
+
+            $url = $uri->toString();
+        }
+
+        return $url;
     }
 }
