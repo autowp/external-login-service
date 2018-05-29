@@ -86,10 +86,10 @@ class GooglePlus extends LeagueOAuth2
         return new Result([
             'externalId' => $ownerDetailsArray['id'],
             'name'       => $ownerDetailsArray['displayName'],
-            'profileUrl' => $ownerDetailsArray['url'],
+            'profileUrl' => isset($ownerDetailsArray['url']) ? $ownerDetailsArray['url'] : null,
             'photoUrl'   => $photoUrl,
             'email'      => $email,
-            'gender'     => $ownerDetailsArray['gender'],
+            'gender'     => isset($ownerDetailsArray['gender']) ? $ownerDetailsArray['gender'] : null,
             'language'   => $ownerDetailsArray['language'],
             'location'   => $location,
             'birthday'   => $birthday
