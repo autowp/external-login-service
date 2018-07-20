@@ -12,11 +12,6 @@ use GuzzleHttp\Exception\BadResponseException;
 class Google extends AbstractService
 {
     /**
-     * @var Google_Client
-     */
-    private $client = null;
-
-    /**
      * @var string
      */
     private $idToken;
@@ -24,21 +19,6 @@ class Google extends AbstractService
     public function getState()
     {
         return '';
-    }
-
-    /**
-     * @return Google_Client
-     */
-    public function getClient()
-    {
-        if (! $this->client) {
-            $this->client = new Google_Client([
-                'client_id' => $this->options['clientId']
-            ]);
-            $this->client->addScope("email");
-        }
-
-        return $this->client;
     }
 
     /**
@@ -79,7 +59,23 @@ class Google extends AbstractService
      */
     public function getData(array $options)
     {
-        $payload = $this->getClient()->verifyIdToken($this->idToken);
+        $clientIDs = preg_split("/[[:space:]]+/isu", $this->options['clientId']);
+
+        foreach ($clientIDs as $clientID) {
+            if (! $clientID) {
+                continue;
+            }
+
+            $client = new Google_Client([
+                'client_id' => $clientID
+            ]);
+
+            $payload = $client->verifyIdToken($this->idToken);
+            if ($payload) {
+                break;
+            }
+        }
+
         if (! $payload) {
             throw new Exception("idToken verification failed");
         }
