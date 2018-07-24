@@ -82,7 +82,7 @@ class Google extends AbstractService
 
         $photoUrl = $payload['picture'];
         if ($photoUrl) {
-            $photoUrl = $this->setSizeParam($photoUrl, 500);
+            $photoUrl = $this->setSizeParam($photoUrl, 640);
         }
 
         return new Result([
