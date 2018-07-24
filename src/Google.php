@@ -80,11 +80,16 @@ class Google extends AbstractService
             throw new Exception("idToken verification failed");
         }
 
+        $photoUrl = $payload['picture'];
+        if ($photoUrl) {
+            $photoUrl = $this->setSizeParam($photoUrl, 500);
+        }
+
         return new Result([
             'externalId' => $payload['sub'],
             'name'       => $payload['name'],
             'profileUrl' => '',
-            'photoUrl'   => $payload['picture'],
+            'photoUrl'   => $photoUrl,
             'location'   => '',
             'language'   => $payload['locale'],
             'email'      => $payload['email']
@@ -94,5 +99,20 @@ class Google extends AbstractService
     public function getFriends()
     {
         return [];
+    }
+
+    private function setSizeParam(string $url, int $size)
+    {
+        $uri = \Zend\Uri\UriFactory::factory($url);
+
+        if ($uri instanceof \Zend\Uri\Http) {
+            $params = $uri->getQueryAsArray();
+            $params['sz'] = $size;
+            $uri->setQuery($params);
+
+            $url = $uri->toString();
+        }
+
+        return $url;
     }
 }
