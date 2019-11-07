@@ -14,7 +14,7 @@ class VkTest extends AbstractHttpControllerTestCase
 {
     protected $appConfigPath = __DIR__ . '/_files/config/application.config.php';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (! $this->appConfigPath) {
             throw new \Exception("Application config path not provided");
