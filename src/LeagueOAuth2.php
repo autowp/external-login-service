@@ -2,8 +2,7 @@
 
 namespace Autowp\ExternalLoginService;
 
-use Autowp\ExternalLoginService\AbstractService;
-
+use InvalidArgumentException;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Token\AccessToken;
 
@@ -68,9 +67,11 @@ abstract class LeagueOAuth2 extends AbstractService
 
     public function callback(array $params)
     {
-        $provider = $this->getProvider();
+        if (! isset($params['code'])) {
+            throw new InvalidArgumentException("`code` not provided");
+        }
 
-        $this->accessToken = $provider->getAccessToken('authorization_code', [
+        $this->accessToken = $this->getProvider()->getAccessToken('authorization_code', [
             'code' => $params['code']
         ]);
 
