@@ -1,8 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\ExternalLoginService;
 
-use Zend\ServiceManager\AbstractPluginManager;
+use Interop\Container\Exception\ContainerException;
+use Laminas\ServiceManager\AbstractPluginManager;
+use Laminas\ServiceManager\Exception\InvalidServiceException;
+
+use function get_class;
+use function gettype;
+use function is_object;
+use function sprintf;
 
 class PluginManager extends AbstractPluginManager
 {
@@ -39,19 +48,18 @@ class PluginManager extends AbstractPluginManager
      * Validate an instance
      *
      * @param  object $plugin
-     * @return void
-     * @throws InvalidServiceException If created instance does not respect the
-     *     constraint on type imposed by the plugin manager
-     * @throws ContainerException if any other error occurs
+     * @throws InvalidServiceException If created instance does not respect the.
+     *     constraint on type imposed by the plugin manager.
+     * @throws ContainerException If any other error occurs.
      */
     public function validate($plugin)
     {
         if (! $plugin instanceof $this->instanceOf) {
             throw new InvalidServiceException(sprintf(
                 '%s expects only to create instances of %s; %s is invalid',
-                get_class($this),
+                static::class,
                 $this->instanceOf,
-                (is_object($plugin) ? get_class($plugin) : gettype($plugin))
+                is_object($plugin) ? get_class($plugin) : gettype($plugin)
             ));
         }
     }

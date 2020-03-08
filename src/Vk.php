@@ -1,15 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\ExternalLoginService;
 
-use Autowp\ExternalLoginService\Exception;
-use Autowp\ExternalLoginService\LeagueOAuth2;
-use Autowp\ExternalLoginService\Result;
-use Autowp\ExternalLoginService\Provider\Vk as VkProvider;
+use Autowp\ExternalLoginService\Provider\VkProvider;
 
-class Vk extends LeagueOAuth2
+class Vk extends AbstractLeagueOAuth2
 {
-    protected function createProvider()
+    protected function createProvider(): VkProvider
     {
         return new VkProvider([
             'clientId'     => $this->options['clientId'],
@@ -18,20 +17,17 @@ class Vk extends LeagueOAuth2
         ]);
     }
 
-    protected function getAuthorizationUrl()
+    protected function getAuthorizationUrl(): string
     {
         return $this->getProvider()->getAuthorizationUrl();
     }
 
-    protected function getFriendsAuthorizationUrl()
+    protected function getFriendsAuthorizationUrl(): string
     {
-        throw new Exception("Not implemented");
+        return '';
     }
 
-    /**
-     * @return Result
-     */
-    public function getData(array $options)
+    public function getData(array $options): Result
     {
         $provider = $this->getProvider();
 
@@ -45,7 +41,7 @@ class Vk extends LeagueOAuth2
             'externalId' => null,
             'name'       => null,
             'profileUrl' => null,
-            'photoUrl'   => null
+            'photoUrl'   => null,
         ];
 
         $vkUser = $ownerDetails->toArray();
@@ -73,21 +69,13 @@ class Vk extends LeagueOAuth2
         return new Result($data);
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
-    public function serviceFriends(string $token)
+    public function getFriendsUrl(): string
     {
-        throw new Exception("Not implemented");
+        return '';
     }
 
-    public function getFriendsUrl()
+    public function getFriends(): array
     {
-        throw new Exception("Not implemented");
-    }
-
-    public function getFriends()
-    {
-        throw new Exception("Not implemented");
+        return [];
     }
 }

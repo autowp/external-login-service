@@ -1,19 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\ExternalLoginService\Provider;
 
-use J4k\OAuth2\Client\Provider\Vkontakte as VkProvider;
+use J4k\OAuth2\Client\Provider\Vkontakte;
 use League\OAuth2\Client\Token\AccessToken;
 
-class Vk extends VkProvider
+class VkProvider extends Vkontakte
 {
-    /**
-     * @var string
-     */
-    private $lang = null;
+    /** @var string */
+    private $lang;
 
+    /** @var array */
     public $scopes = [
-        'status'
+        'status',
         //'email',
         //'friends',
         //'offline',
@@ -35,6 +36,7 @@ class Vk extends VkProvider
         //'video',
     ];
 
+    /** @var array */
     public $userFields = [
         //'bdate',
         //'city',
@@ -104,24 +106,22 @@ class Vk extends VkProvider
         //'wall_comments',
     ];
 
-    public function setLang($language)
+    public function setLang(string $language): self
     {
-        $this->lang = (string)$language;
+        $this->lang = $language;
 
         return $this;
     }
 
-    public function getResourceOwnerDetailsUrl(AccessToken $token)
+    public function getResourceOwnerDetailsUrl(AccessToken $token): string
     {
         $params = [
             'fields'       => $this->userFields,
             'access_token' => $token->getToken(),
             'v'            => $this->version,
-            'lang'         => $this->lang
+            'lang'         => $this->lang,
         ];
         $query  = $this->buildQueryString($params);
-        $url    = "$this->baseUri/users.get?$query";
-
-        return $url;
+        return "$this->baseUri/users.get?$query";
     }
 }

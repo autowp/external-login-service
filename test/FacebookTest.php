@@ -1,13 +1,16 @@
 <?php
 
-namespace AutowpTest\ExternalLoginService;
+declare(strict_types=1);
 
-use League\OAuth2\Client;
-use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
+namespace AutowpTest\ExternalLoginService;
 
 use Autowp\ExternalLoginService\Facebook;
 use Autowp\ExternalLoginService\PluginManager;
+use Autowp\ExternalLoginService\Provider\FacebookProvider;
 use Autowp\ExternalLoginService\Result;
+use Exception;
+use Laminas\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
+use League\OAuth2\Client;
 
 class FacebookTest extends AbstractHttpControllerTestCase
 {
@@ -16,7 +19,7 @@ class FacebookTest extends AbstractHttpControllerTestCase
     protected function setUp(): void
     {
         if (! $this->appConfigPath) {
-            throw new \Exception("Application config path not provided");
+            throw new Exception("Application config path not provided");
         }
 
         $this->setApplicationConfig(include $this->appConfigPath);
@@ -24,26 +27,28 @@ class FacebookTest extends AbstractHttpControllerTestCase
         parent::setUp();
     }
 
-    private function mockProvider()
+    private function mockProvider(): void
     {
-        $providerMock = $this->getMockBuilder(\Autowp\ExternalLoginService\Provider\Facebook::class)
+        $providerMock = $this->getMockBuilder(FacebookProvider::class)
             ->setMethods(['getResourceOwner', 'getAccessToken'])
-            ->setConstructorArgs([[
-                'graphApiVersion' => 'v2.10'
-            ]])
+            ->setConstructorArgs([
+                [
+                    'graphApiVersion' => 'v2.10',
+                ],
+            ])
             ->getMock();
 
         $providerMock->method('getResourceOwner')->willReturnCallback(function () {
             return new Client\Provider\FacebookUser([
-                'id'         => 'user_id',
-                'name'       => 'UserName',
-                'link'       => 'http://example.com/user_id'
+                'id'   => 'user_id',
+                'name' => 'UserName',
+                'link' => 'http://example.com/user_id',
             ]);
         });
 
         $providerMock->method('getAccessToken')->willReturnCallback(function () {
             return new Client\Token\AccessToken([
-                'access_token'  => 'returned_access_token'
+                'access_token' => 'returned_access_token',
             ]);
         });
 
@@ -52,10 +57,7 @@ class FacebookTest extends AbstractHttpControllerTestCase
         $service->setProvider($providerMock);
     }
 
-    /**
-     * @return Facebook
-     */
-    private function getService()
+    private function getService(): Facebook
     {
         $manager = $this->getApplicationServiceLocator()->get('ExternalLoginServiceManager');
 
@@ -68,37 +70,37 @@ class FacebookTest extends AbstractHttpControllerTestCase
         return $service;
     }
 
-    public function testUrls()
+    public function testUrls(): void
     {
         $service = $this->getService();
 
         $url = $service->getLoginUrl();
 
         $this->assertRegExp(
-            '|^https://www\.facebook\.com/v2\.10/dialog/oauth' .
-                '\?scope=public_profile%2Cuser_friends&state=[a-z0-9]+&' .
-                'response_type=code&approval_prompt=auto' .
-                '&redirect_uri=http%3A%2F%2Fexample.com%2Fcallback&client_id=xxxx$|iu',
+            '|^https://www\.facebook\.com/v2\.10/dialog/oauth'
+                . '\?scope=public_profile%2Cuser_friends&state=[a-z0-9]+&'
+                . 'response_type=code&approval_prompt=auto'
+                . '&redirect_uri=http%3A%2F%2Fexample.com%2Fcallback&client_id=xxxx$|iu',
             $url
         );
     }
 
-    public function testFriendsUrl()
+    public function testFriendsUrl(): void
     {
         $service = $this->getService();
 
         $url = $service->getFriendsUrl();
 
         $this->assertRegExp(
-            '|^https://www\.facebook\.com/v2\.10/dialog/oauth' .
-                '\?scope=public_profile%2Cuser_friends&state=[a-z0-9]+&' .
-                'response_type=code&approval_prompt=auto' .
-                '&redirect_uri=http%3A%2F%2Fexample.com%2Fcallback&client_id=xxxx$|iu',
+            '|^https://www\.facebook\.com/v2\.10/dialog/oauth'
+                . '\?scope=public_profile%2Cuser_friends&state=[a-z0-9]+&'
+                . 'response_type=code&approval_prompt=auto'
+                . '&redirect_uri=http%3A%2F%2Fexample.com%2Fcallback&client_id=xxxx$|iu',
             $url
         );
     }
 
-    public function testThrowsCredentialRequired()
+    public function testThrowsCredentialRequired(): void
     {
         $this->expectException(Client\Provider\Exception\IdentityProviderException::class);
 
@@ -108,7 +110,7 @@ class FacebookTest extends AbstractHttpControllerTestCase
         $service->getData([]);
     }
 
-    public function testGetData()
+    public function testGetData(): void
     {
         $this->mockProvider();
 
@@ -125,14 +127,14 @@ class FacebookTest extends AbstractHttpControllerTestCase
         $this->assertEquals('https://graph.facebook.com/user_id/picture?type=large', $data->getPhotoUrl());
     }
 
-    public function testCallback()
+    public function testCallback(): void
     {
         $this->mockProvider();
 
         $service = $this->getService();
 
         $accessToken = $service->callback([
-            'code' => 'zzzz'
+            'code' => 'zzzz',
         ]);
 
         $this->assertEquals('returned_access_token', $accessToken);

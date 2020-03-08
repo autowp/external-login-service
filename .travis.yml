@@ -1,18 +1,25 @@
 language: php
 php:
-  - '7.2'
-  - '7.3'
-matrix:
-  allow_failures:
-  - php: nightly
-    
-before_script: composer install --no-progress --no-interaction --no-suggest
+  - '7.4'
+
+addons:
+  sonarcloud:
+    organization: "autowp-github"
+    token:
+      secure: $SONARCLOUD_TOKEN
+
+before_script:
+  - composer install --no-progress --no-interaction --no-suggest
+  - curl -Ls https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
 
 script:
-- composer cs-check
-- composer phpmd
-- ./vendor/bin/phpunit --coverage-clover ./test/logs/clover.xml
+  - ./cc-test-reporter before-build || travis_terminate 1;
+  - composer cs-check || travis_terminate 1;
+  - composer phpmd || travis_terminate 1;
+  - ./vendor/bin/phpunit --coverage-clover ./clover.xml || travis_terminate 1;
 
 after_script:
-- ./vendor/bin/coveralls -v
-- ./vendor/bin/test-reporter -v --coverage-report=./test/logs/clover.xml
+  - sonar-scanner -Dsonar.login=$SONARCLOUD_TOKEN || travis_terminate 1;
+  - ./vendor/bin/php-coveralls -v -x ./clover.xml
+  - ./cc-test-reporter after-build -t clover --exit-code $TRAVIS_TEST_RESULT ./clover.xml

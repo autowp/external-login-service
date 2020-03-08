@@ -1,27 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\ExternalLoginService;
 
 use DateTime;
+use Laminas\Json\Json;
 use Locale;
 
-use Zend\Json\Json;
+use function count;
+use function file_get_contents;
+use function http_build_query;
+use function is_array;
+use function sprintf;
 
-class Facebook extends LeagueOAuth2
+class Facebook extends AbstractLeagueOAuth2
 {
-    private $defaultScope = ['public_profile', 'user_friends', 'user_hometown'];
+    private array $defaultScope = ['public_profile', 'user_friends', 'user_hometown'];
 
-    protected function createProvider()
+    protected function createProvider(): Provider\FacebookProvider
     {
-        return new Provider\Facebook([
+        return new Provider\FacebookProvider([
             'clientId'        => $this->options['clientId'],
             'clientSecret'    => $this->options['clientSecret'],
-            'redirectUri'     => isset($this->options['redirectUri']) ? $this->options['redirectUri'] : null,
+            'redirectUri'     => $this->options['redirectUri'] ?? null,
             'graphApiVersion' => $this->options['graphApiVersion'],
         ]);
     }
 
-    private function getScope()
+    private function getScope(): array
     {
         $scope = $this->defaultScope;
         if (isset($this->options['scope']) && is_array($this->options['scope'])) {
@@ -31,25 +38,22 @@ class Facebook extends LeagueOAuth2
         return $scope;
     }
 
-    protected function getAuthorizationUrl()
+    protected function getAuthorizationUrl(): string
     {
         return $this->getProvider()->getAuthorizationUrl([
-            'scope' => $this->getScope()
+            'scope' => $this->getScope(),
         ]);
     }
 
-    protected function getFriendsAuthorizationUrl()
+    protected function getFriendsAuthorizationUrl(): string
     {
         return $this->getProvider()->getAuthorizationUrl([
-            'scope' => $this->getScope()
+            'scope' => $this->getScope(),
         ]);
     }
 
-    /**
-     * @var string
-     */
-    protected $imageUrlTemplate =
-        'https://graph.facebook.com/%s/picture?type=large';
+    /** @var string */
+    protected string $imageUrlTemplate = 'https://graph.facebook.com/%s/picture?type=large';
 
     /**
      * @param array $options
@@ -64,11 +68,9 @@ class Facebook extends LeagueOAuth2
     }*/
 
     /**
-     * @return Result
-     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getData(array $options)
+    public function getData(array $options): Result
     {
         $provider = $this->getProvider();
 
@@ -85,11 +87,11 @@ class Facebook extends LeagueOAuth2
             'email'      => null,
             'gender'     => null,
             'location'   => null,
-            'language'   => null
+            'language'   => null,
         ];
         if (isset($json['id']) && $json['id']) {
             $data['externalId'] = $json['id'];
-            $data['photoUrl'] = sprintf($this->imageUrlTemplate, $json['id']);
+            $data['photoUrl']   = sprintf($this->imageUrlTemplate, $json['id']);
         }
         if (isset($json['name']) && $json['name']) {
             $data['name'] = $json['name'];
@@ -118,17 +120,17 @@ class Facebook extends LeagueOAuth2
         return new Result($data);
     }
 
-    public function getFriends()
+    public function getFriends(): array
     {
         if (! $this->accessToken) {
-            throw new Exception("Access token not provided");
+            throw new ExternalLoginServiceException("Access token not provided");
         }
 
         $limit = 1000;
-        $url = 'https://graph.facebook.com/' . $this->options['graphApiVersion']. '/me/friends?' . http_build_query([
+        $url   = 'https://graph.facebook.com/' . $this->options['graphApiVersion'] . '/me/friends?' . http_build_query([
             'limit'        => $limit,
             'offset'       => 0,
-            'access_token' => $this->accessToken->getToken()
+            'access_token' => $this->accessToken->getToken(),
         ]);
 
         $friendsId = [];
@@ -141,18 +143,18 @@ class Facebook extends LeagueOAuth2
             }
 
             if (! $response) {
-                throw new Exception('Error requesting data');
+                throw new ExternalLoginServiceException('Error requesting data');
             }
 
             if (isset($response->data) && is_array($response->data)) {
                 foreach ($response->data as $value) {
-                    $friendsId[] = (string)$value->id;
+                    $friendsId[] = (string) $value->id;
                 }
             }
-            if (count($friendsId) == 0) {
+            if (count($friendsId) === 0) {
                 break;
             }
-            if (count($friendsId) != $limit || ! isset($response->paging->next)) {
+            if (count($friendsId) !== $limit || ! isset($response->paging->next)) {
                 break;
             }
             $url = $response->paging->next;

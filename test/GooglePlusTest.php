@@ -1,13 +1,15 @@
 <?php
 
-namespace AutowpTest\ExternalLoginService;
+declare(strict_types=1);
 
-use League\OAuth2\Client;
-use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
+namespace AutowpTest\ExternalLoginService;
 
 use Autowp\ExternalLoginService\GooglePlus;
 use Autowp\ExternalLoginService\PluginManager;
 use Autowp\ExternalLoginService\Result;
+use Exception;
+use Laminas\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
+use League\OAuth2\Client;
 
 class GooglePlusTest extends AbstractHttpControllerTestCase
 {
@@ -16,7 +18,7 @@ class GooglePlusTest extends AbstractHttpControllerTestCase
     protected function setUp(): void
     {
         if (! $this->appConfigPath) {
-            throw new \Exception("Application config path not provided");
+            throw new Exception("Application config path not provided");
         }
 
         $this->setApplicationConfig(include $this->appConfigPath);
@@ -24,9 +26,9 @@ class GooglePlusTest extends AbstractHttpControllerTestCase
         parent::setUp();
     }
 
-    private function mockProvider()
+    private function mockProvider(): void
     {
-        $providerMock = $this->getMockBuilder(\League\OAuth2\Client\Provider\Google::class)
+        $providerMock = $this->getMockBuilder(Client::class)
             ->setMethods(['getResourceOwner', 'getAccessToken'])
             ->setConstructorArgs([[]])
             ->getMock();
@@ -36,17 +38,17 @@ class GooglePlusTest extends AbstractHttpControllerTestCase
                 'id'          => 'user_id',
                 'displayName' => 'UserName',
                 'url'         => 'http://example.com/user_id',
-                'image' => [
-                    'url' => 'https://lh5.googleusercontent.com/photo.jpg?sz=50'
+                'image'       => [
+                    'url' => 'https://lh5.googleusercontent.com/photo.jpg?sz=50',
                 ],
                 'gender'      => 'male',
-                'language'    => 'en'
+                'language'    => 'en',
             ]);
         });
 
         $providerMock->method('getAccessToken')->willReturnCallback(function () {
             return new Client\Token\AccessToken([
-                'access_token'  => 'returned_access_token'
+                'access_token' => 'returned_access_token',
             ]);
         });
 
@@ -55,10 +57,7 @@ class GooglePlusTest extends AbstractHttpControllerTestCase
         $service->setProvider($providerMock);
     }
 
-    /**
-     * @return GooglePlus
-     */
-    private function getService()
+    private function getService(): GooglePlus
     {
         $manager = $this->getApplicationServiceLocator()->get('ExternalLoginServiceManager');
 
@@ -71,34 +70,34 @@ class GooglePlusTest extends AbstractHttpControllerTestCase
         return $service;
     }
 
-    public function testUrls()
+    public function testUrls(): void
     {
         $service = $this->getService();
 
         $url = $service->getLoginUrl();
 
         $this->assertRegExp(
-            '|^https://accounts\.google\.com/o/oauth2/auth' .
-                '\?scope='.
-                    'https%3A%2F%2Fwww\.googleapis\.com%2Fauth%2Fplus\.me%20' .
-                    'https%3A%2F%2Fwww\.googleapis\.com%2Fauth%2Fuserinfo\.email%20'.
-                    'https%3A%2F%2Fwww\.googleapis\.com%2Fauth%2Fuserinfo\.profile' .
-                '&state=[a-z0-9]+&response_type=code&approval_prompt=auto' .
-                '&redirect_uri=http%3A%2F%2Fexample.com%2Fcallback&client_id=xxxx&authuser=-1$|iu',
+            '|^https://accounts\.google\.com/o/oauth2/auth'
+                . '\?scope='
+                    . 'https%3A%2F%2Fwww\.googleapis\.com%2Fauth%2Fplus\.me%20'
+                    . 'https%3A%2F%2Fwww\.googleapis\.com%2Fauth%2Fuserinfo\.email%20'
+                    . 'https%3A%2F%2Fwww\.googleapis\.com%2Fauth%2Fuserinfo\.profile'
+                . '&state=[a-z0-9]+&response_type=code&approval_prompt=auto'
+                . '&redirect_uri=http%3A%2F%2Fexample.com%2Fcallback&client_id=xxxx&authuser=-1$|iu',
             $url
         );
     }
 
-    public function testFriendsUrl()
+    public function testFriendsUrl(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
 
         $service = $this->getService();
 
         $service->getFriendsUrl();
     }
 
-    public function testThrowsCredentialRequired()
+    public function testThrowsCredentialRequired(): void
     {
         $this->expectException(Client\Provider\Exception\IdentityProviderException::class);
 
@@ -108,7 +107,7 @@ class GooglePlusTest extends AbstractHttpControllerTestCase
         $service->getData([]);
     }
 
-    public function testGetData()
+    public function testGetData(): void
     {
         $this->mockProvider();
 
@@ -125,14 +124,14 @@ class GooglePlusTest extends AbstractHttpControllerTestCase
         $this->assertEquals('https://lh5.googleusercontent.com/photo.jpg', $data->getPhotoUrl());
     }
 
-    public function testCallback()
+    public function testCallback(): void
     {
         $this->mockProvider();
 
         $service = $this->getService();
 
         $accessToken = $service->callback([
-            'code' => 'zzzz'
+            'code' => 'zzzz',
         ]);
 
         $this->assertEquals('returned_access_token', $accessToken);

@@ -1,63 +1,47 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\ExternalLoginService;
 
-use Autowp\ExternalLoginService\Exception;
-
 use DateTime;
-use Zend\Validator\Uri;
-use Zend\Validator\EmailAddress;
+use Laminas\Validator\EmailAddress;
+use Laminas\Validator\Uri;
+
+use function method_exists;
+use function ucfirst;
 
 class Result
 {
-    /**
-     * @var string
-     */
-    private $externalId = null;
+    /** @var string */
+    private string $externalId;
+
+    /** @var string */
+    private string $name;
+
+    /** @var string */
+    private ?string $profileUrl;
+
+    /** @var string */
+    private ?string $photoUrl;
+
+    /** @var DateTime */
+    private ?DateTime $birthday;
+
+    /** @var string */
+    private ?string $email;
+
+    /** @var string */
+    private ?string $gender;
+
+    /** @var string */
+    private ?string $location;
+
+    /** @var string */
+    private ?string $language;
 
     /**
-     * @var string
-     */
-    private $name = null;
-
-    /**
-     * @var string
-     */
-    private $profileUrl = null;
-
-    /**
-     * @var string
-     */
-    private $photoUrl = null;
-
-    /**
-     * @var DateTime
-     */
-    private $birthday = null;
-
-    /**
-     * @var string
-     */
-    private $email = null;
-
-    /**
-     * @var string
-     */
-    private $gender = null;
-
-    /**
-     * @var string
-     */
-    private $location = null;
-
-    /**
-     * @var string
-     */
-    private $language = null;
-
-    /**
-     * @param array $options
-     * @throws Exception
+     * @throws ExternalLoginServiceException
      */
     public function __construct(array $options = [])
     {
@@ -65,17 +49,15 @@ class Result
     }
 
     /**
-     * @param array $options
-     * @return Result
-     * @throws Exception
+     * @throws ExternalLoginServiceException
      */
-    public function setOptions(array $options)
+    public function setOptions(array $options): self
     {
         foreach ($options as $key => $value) {
             $method = 'set' . ucfirst($key);
 
             if (! method_exists($this, $method)) {
-                throw new Exception("Unexpected option '$key'");
+                throw new ExternalLoginServiceException("Unexpected option '$key'");
             }
             $this->$method($value);
         }
@@ -83,53 +65,38 @@ class Result
         return $this;
     }
 
-    /**
-     * @param string $externalId
-     * @return Result
-     */
-    public function setExternalId($externalId)
+    public function setExternalId(string $externalId): self
     {
-        $this->externalId = (string)$externalId;
+        $this->externalId = $externalId;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getExternalId()
+    public function getExternalId(): string
     {
         return $this->externalId;
     }
 
-    /**
-     * @param string $name
-     * @return Result
-     */
-    public function setName($name)
+    public function setName(string $name): self
     {
-        $this->name = (string)$name;
+        $this->name = $name;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
     /**
      * @param string $profileUrl
-     * @return Result
      */
-    public function setProfileUrl($profileUrl)
+    public function setProfileUrl($profileUrl): self
     {
         $this->profileUrl = null;
 
-        $profileUrl = (string)$profileUrl;
+        $profileUrl = (string) $profileUrl;
 
         if ($profileUrl) {
             $this->profileUrl = $profileUrl;
@@ -144,27 +111,23 @@ class Result
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getProfileUrl()
+    public function getProfileUrl(): ?string
     {
         return $this->profileUrl;
     }
 
     /**
      * @param string $photoUrl
-     * @return Result
      */
-    public function setPhotoUrl($photoUrl)
+    public function setPhotoUrl($photoUrl): self
     {
         $this->photoUrl = null;
 
-        $photoUrl = (string)$photoUrl;
+        $photoUrl = (string) $photoUrl;
 
         if ($photoUrl) {
             $validator = new Uri([
-                'allowRelative' => false
+                'allowRelative' => false,
             ]);
 
             if (! $validator->isValid($photoUrl)) {
@@ -177,29 +140,25 @@ class Result
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getPhotoUrl()
+    public function getPhotoUrl(): ?string
     {
         return $this->photoUrl;
     }
 
     /**
      * @param string $email
-     * @return Result
      */
-    public function setEmail($email)
+    public function setEmail($email): self
     {
         $this->email = null;
 
-        $email = (string)$email;
+        $email = (string) $email;
 
         if ($email) {
             $validator = new EmailAddress();
 
             if (! $validator->isValid($email)) {
-                throw new InvalidEmailAddressException("Invalid e-mail `$email`");
+                throw new InvalidEmailAddressExternalLoginServiceException("Invalid e-mail `$email`");
             }
 
             $this->email = $email;
@@ -208,86 +167,55 @@ class Result
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getEmail()
+    public function getEmail(): ?string
     {
         return $this->email;
     }
 
-    /**
-     * @param DateTime $birthday
-     * @return Result
-     */
-    public function setBirthday(DateTime $birthday = null)
+    public function setBirthday(?DateTime $birthday = null): self
     {
         $this->birthday = $birthday;
 
         return $this;
     }
 
-    /**
-     * @return DateTime
-     */
-    public function getBirthday()
+    public function getBirthday(): ?DateTime
     {
         return $this->birthday;
     }
 
-    /**
-     * @param string $gender
-     * @return Result
-     */
-    public function setGender($gender)
+    public function setGender(string $gender): self
     {
         $this->gender = $gender;
 
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    public function getGender()
+    public function getGender(): ?string
     {
         return $this->gender;
     }
 
-    /**
-     * @param string $location
-     * @return Result
-     */
-    public function setLocation($location)
+    public function setLocation(string $location): self
     {
         $this->location = $location;
 
         return $this;
     }
 
-    /**
-     * @return string $location
-     */
-    public function getLocation()
+    public function getLocation(): ?string
     {
         return $this->location;
     }
 
-    /**
-     * @param string $language
-     * @return Result
-     */
-    public function setLanguage($language)
+    public function setLanguage(string $language): self
     {
         $this->language = $language;
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'externalId' => $this->externalId,
@@ -298,11 +226,11 @@ class Result
             'birthday'   => $this->birthday,
             'gender'     => $this->gender,
             'location'   => $this->location,
-            'language'   => $this->language
+            'language'   => $this->language,
         ];
     }
 
-    public static function fromArray(array $options)
+    public static function fromArray(array $options): self
     {
         return new self($options);
     }

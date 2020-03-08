@@ -1,41 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\ExternalLoginService;
 
-use Autowp\ExternalLoginService\Exception;
-use Autowp\ExternalLoginService\AbstractService;
-use Autowp\ExternalLoginService\Result;
-
-use League\OAuth1\Client;
+use Exception;
 use GuzzleHttp\Exception\BadResponseException;
+use Laminas\Session\Container;
+use League\OAuth1\Client;
+use League\OAuth1\Client\Credentials\TokenCredentials;
+
+use function count;
+use function http_build_query;
+use function json_decode;
+use function str_replace;
+
+use const JSON_THROW_ON_ERROR;
 
 class Twitter extends AbstractService
 {
-    /**
-     * @var Twitter
-     */
-    private $server = null;
+    private Client\Server\Twitter $server;
 
-    /**
-     *
-     * @var \Zend\Session\Container
-     */
-    private $session;
+    /** @var Container */
+    private Container $session;
 
-    /**
-     *
-     * @var Client\Credentials\TokenCredentials
-     */
-    private $accessToken = null;
+    /** @var Client\Credentials\TokenCredentials */
+    private Client\Credentials\TokenCredentials $accessToken;
 
-    /**
-     * @var string
-     */
-    private $state = null;
+    /** @var string */
+    private string $state;
 
-    public function getSession()
+    public function getSession(): Container
     {
-        return $this->session ? $this->session : $this->session = new \Zend\Session\Container('Twitter');
+        return $this->session ? $this->session : $this->session = new Container('Twitter');
     }
 
     /**
@@ -46,7 +43,7 @@ class Twitter extends AbstractService
         if (! $this->server) {
             $serverOptions = [
                 'identifier' => $this->options['consumerKey'],
-                'secret'     => $this->options['consumerSecret']
+                'secret'     => $this->options['consumerSecret'],
             ];
             if (isset($this->options['redirectUri'])) {
                 $serverOptions['callback_uri'] = $this->options['redirectUri'];
@@ -63,15 +60,12 @@ class Twitter extends AbstractService
         $this->server = $server;
     }
 
-    public function getState()
+    public function getState(): string
     {
         return $this->state;
     }
 
-    /**
-     * @return string
-     */
-    public function getLoginUrl()
+    public function getLoginUrl(): string
     {
         $temporaryCredentials = $this->getServer()->getTemporaryCredentials();
 
@@ -85,10 +79,7 @@ class Twitter extends AbstractService
         return $this->getServer()->getAuthorizationUrl($temporaryCredentials);
     }
 
-    /**
-     * @return string
-     */
-    public function getFriendsUrl()
+    public function getFriendsUrl(): string
     {
         $temporaryCredentials = $this->getServer()->getTemporaryCredentials();
 
@@ -102,23 +93,20 @@ class Twitter extends AbstractService
         return $this->getServer()->getAuthorizationUrl($temporaryCredentials);
     }
 
-    /**
-     * @param array $params
-     */
-    public function callback(array $params)
+    public function callback(array $params): ?TokenCredentials
     {
         if (isset($params['denied']) && $params['denied']) {
-            return false;
+            return null;
         }
 
         if (! isset($params['oauth_token'], $params['oauth_verifier'])) {
-            throw new Exception('oauth_token or oauth_verifier not provided');
+            throw new ExternalLoginServiceException('oauth_token or oauth_verifier not provided');
         }
 
         // Retrieve the temporary credentials we saved before
         $session = $this->getSession();
         if (! isset($session->temporaryCredentials)) {
-            throw new Exception('Request token not set');
+            throw new ExternalLoginServiceException('Request token not set');
         }
 
         $temporaryCredentials = $session->temporaryCredentials;
@@ -136,11 +124,9 @@ class Twitter extends AbstractService
     }
 
     /**
-     * @return Result
-     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getData(array $options)
+    public function getData(array $options): Result
     {
         $user = $this->getServer()->getUserDetails($this->accessToken);
 
@@ -156,19 +142,22 @@ class Twitter extends AbstractService
             'photoUrl'   => $imageUrl,
             'location'   => $user->location,
             'language'   => $user->lang,
-            'email'      => isset($user->email) ? $user->email : null
+            'email'      => $user->email ?? null,
         ];
 
         return new Result($data);
     }
 
-    private function friendsIds($cursor, $count)
+    /**
+     * @throws Exception
+     */
+    private function friendsIds(int $cursor, int $count): array
     {
         $url = 'https://api.twitter.com/1.1/friends/ids.json';
 
         $url .= '?' . http_build_query([
             'cursor' => $cursor,
-            'count'  => $count
+            'count'  => $count,
         ]);
 
         $client = $this->getServer()->createHttpClient();
@@ -180,34 +169,36 @@ class Twitter extends AbstractService
                 'headers' => $headers,
             ]);
         } catch (BadResponseException $e) {
-            $response = $e->getResponse();
-            $body = $response->getBody();
+            $response   = $e->getResponse();
+            $body       = $response->getBody();
             $statusCode = $response->getStatusCode();
 
-            throw new \Exception(
+            throw new Exception(
                 "Received error [$body] with status code [$statusCode] when retrieving token credentials."
             );
         }
-        $data = json_decode((string) $response->getBody(), true);
-
-        return $data;
+        return json_decode((string) $response->getBody(), true, 512, JSON_THROW_ON_ERROR);
     }
 
-    public function getFriends()
+    /**
+     * @throws Exception
+     */
+    public function getFriends(): array
     {
-        $cursor = - 1;
+        $cursor    = - 1;
         $friendsId = [];
-        $count = 1000;
+        $count     = 1000;
         while (true) {
             $response = $this->friendsIds($cursor, $count);
             if (! $response) {
                 break;
             }
 
+            $value = null;
             foreach ($response['ids'] as &$value) {
                 $friendsId[] = (string) $value;
             }
-            if (count($response['ids']) != $count) {
+            if (count($response['ids']) !== $count) {
                 break;
             }
 

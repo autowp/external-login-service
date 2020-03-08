@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AutowpTest\ExternalLoginService;
 
-use League\OAuth1\Client;
-use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
-
-use Autowp\ExternalLoginService\Twitter;
 use Autowp\ExternalLoginService\PluginManager;
 use Autowp\ExternalLoginService\Result;
+use Autowp\ExternalLoginService\Twitter;
+use Exception;
+use Laminas\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
+use League\OAuth1\Client;
 
 class TwitterTest extends AbstractHttpControllerTestCase
 {
@@ -16,7 +18,7 @@ class TwitterTest extends AbstractHttpControllerTestCase
     protected function setUp(): void
     {
         if (! $this->appConfigPath) {
-            throw new \Exception("Application config path not provided");
+            throw new Exception("Application config path not provided");
         }
 
         $this->setApplicationConfig(include $this->appConfigPath);
@@ -24,34 +26,34 @@ class TwitterTest extends AbstractHttpControllerTestCase
         parent::setUp();
     }
 
-    private function mockProvider()
+    private function mockProvider(): void
     {
         $serverMock = $this->getMockBuilder(Client\Server\Twitter::class)
             ->setMethods(['getUserDetails', 'getTemporaryCredentials', 'getTokenCredentials'])
-            ->setConstructorArgs([[
-                'identifier'   => 'xxxx',
-                'secret'       => 'yyyy',
-                'callback_uri' => 'http://example.com/'
-            ]])
+            ->setConstructorArgs([
+                [
+                    'identifier'   => 'xxxx',
+                    'secret'       => 'yyyy',
+                    'callback_uri' => 'http://example.com/',
+                ],
+            ])
             ->getMock();
 
         $serverMock->method('getUserDetails')->willReturnCallback(function () {
-
             $user = new Client\Server\User();
 
-            $user->uid = 'user_id';
-            $user->nickname = 'user_id';
-            $user->name = 'UserName';
-            $user->location = 'New York';
+            $user->uid         = 'user_id';
+            $user->nickname    = 'user_id';
+            $user->name        = 'UserName';
+            $user->location    = 'New York';
             $user->description = 'Description';
-            $user->imageUrl = 'http://example.com/user_id.jpg';
-            $user->email = 'email@example.com';
+            $user->imageUrl    = 'http://example.com/user_id.jpg';
+            $user->email       = 'email@example.com';
 
             return $user;
         });
 
         $serverMock->method('getTemporaryCredentials')->willReturnCallback(function () {
-
             $temporaryCredentials = new Client\Credentials\TemporaryCredentials();
             $temporaryCredentials->setIdentifier('temporary_identifier');
             $temporaryCredentials->setSecret('temporary_secret');
@@ -59,7 +61,6 @@ class TwitterTest extends AbstractHttpControllerTestCase
         });
 
         $serverMock->method('getTokenCredentials')->willReturnCallback(function () {
-
             $tokenCredentials = new Client\Credentials\TokenCredentials();
             $tokenCredentials->setIdentifier('oauth_token');
             $tokenCredentials->setSecret('oauth_token_secret');
@@ -70,10 +71,7 @@ class TwitterTest extends AbstractHttpControllerTestCase
         $this->getService()->setServer($serverMock);
     }
 
-    /**
-     * @return Twitter
-     */
-    private function getService()
+    private function getService(): Twitter
     {
         $manager = $this->getApplicationServiceLocator()->get('ExternalLoginServiceManager');
 
@@ -86,7 +84,7 @@ class TwitterTest extends AbstractHttpControllerTestCase
         return $service;
     }
 
-    public function testUrl()
+    public function testUrl(): void
     {
         $this->mockProvider();
 
@@ -97,13 +95,13 @@ class TwitterTest extends AbstractHttpControllerTestCase
         $this->assertNotEmpty($url);
 
         $this->assertRegExp(
-            '|^https://api\.twitter\.com/oauth/authenticate' .
-                '\?oauth_token=temporary_identifier$|iu',
+            '|^https://api\.twitter\.com/oauth/authenticate'
+                . '\?oauth_token=temporary_identifier$|iu',
             $url
         );
     }
 
-    public function testFriendsUrl()
+    public function testFriendsUrl(): void
     {
         $this->mockProvider();
 
@@ -112,15 +110,15 @@ class TwitterTest extends AbstractHttpControllerTestCase
         $url = $service->getFriendsUrl();
 
         $this->assertRegExp(
-            '|^https://api\.twitter\.com/oauth/authenticate' .
-                '\?oauth_token=temporary_identifier$|iu',
+            '|^https://api\.twitter\.com/oauth/authenticate'
+                . '\?oauth_token=temporary_identifier$|iu',
             $url
         );
     }
 
-    public function testThrowsCredentialRequired()
+    public function testThrowsCredentialRequired(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
 
         $service = $this->getService();
 
@@ -133,7 +131,7 @@ class TwitterTest extends AbstractHttpControllerTestCase
         $service->getData([]);
     }
 
-    public function testGetData()
+    public function testGetData(): void
     {
         $this->mockProvider();
 
@@ -154,7 +152,7 @@ class TwitterTest extends AbstractHttpControllerTestCase
         $this->assertEquals('http://example.com/user_id.jpg', $data->getPhotoUrl());
     }
 
-    public function testCallback()
+    public function testCallback(): void
     {
         $this->mockProvider();
 
@@ -170,7 +168,7 @@ class TwitterTest extends AbstractHttpControllerTestCase
 
         $accessToken = $service->callback([
             'oauth_token'    => 'temporary_identifier',
-            'oauth_verifier' => 'zzzz-verifier'
+            'oauth_verifier' => 'zzzz-verifier',
         ]);
 
         $this->assertEquals('oauth_token', $accessToken->getIdentifier());

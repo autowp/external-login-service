@@ -1,51 +1,59 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\ExternalLoginService;
 
-use Autowp\ExternalLoginService\Exception;
-use Autowp\ExternalLoginService\LeagueOAuth2;
-use Autowp\ExternalLoginService\Result;
-
+use DateTime;
+use Laminas\Uri\Http;
+use Laminas\Uri\UriFactory;
 use League\OAuth2\Client\Provider\Google as GoogleProvider;
 
-use DateTime;
+use function implode;
+use function is_array;
 
-class GooglePlus extends LeagueOAuth2
+class GooglePlus extends AbstractLeagueOAuth2
 {
-    protected function createProvider()
+    protected function createProvider(): GoogleProvider
     {
         return new GoogleProvider([
             'clientId'     => $this->options['clientId'],
             'clientSecret' => $this->options['clientSecret'],
-            'redirectUri'  => isset($this->options['redirectUri']) ? $this->options['redirectUri'] : null,
-            'userFields'   => ['id', 'displayName', 'url', 'image(url)',
-                               'gender', 'language', 'placesLived', 'birthday']
+            'redirectUri'  => $this->options['redirectUri'] ?? null,
+            'userFields'   => [
+                'id',
+                'displayName',
+                'url',
+                'image(url)',
+                'gender',
+                'language',
+                'placesLived',
+                'birthday',
+            ],
             //'hostedDomain' => 'example.com',
         ]);
     }
 
-    protected function getAuthorizationUrl()
+    protected function getAuthorizationUrl(): string
     {
         return $this->getProvider()->getAuthorizationUrl([
             'scope' => implode(' ', [
                 'https://www.googleapis.com/auth/plus.me',
                 'https://www.googleapis.com/auth/userinfo.email',
-                'https://www.googleapis.com/auth/userinfo.profile'
+                'https://www.googleapis.com/auth/userinfo.profile',
             ]),
         ]);
     }
 
-    protected function getFriendsAuthorizationUrl()
+    protected function getFriendsAuthorizationUrl(): string
     {
-        throw new Exception("Not implemented");
+        return '';
     }
 
     /**
-     * @return Result
-     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getData(array $options)
+    public function getData(array $options): Result
     {
         $provider = $this->getProvider();
 
@@ -86,31 +94,31 @@ class GooglePlus extends LeagueOAuth2
         return new Result([
             'externalId' => $ownerDetailsArray['id'],
             'name'       => $ownerDetailsArray['displayName'],
-            'profileUrl' => isset($ownerDetailsArray['url']) ? $ownerDetailsArray['url'] : null,
+            'profileUrl' => $ownerDetailsArray['url'] ?? null,
             'photoUrl'   => $photoUrl,
             'email'      => $email,
-            'gender'     => isset($ownerDetailsArray['gender']) ? $ownerDetailsArray['gender'] : null,
+            'gender'     => $ownerDetailsArray['gender'] ?? null,
             'language'   => $ownerDetailsArray['language'],
             'location'   => $location,
-            'birthday'   => $birthday
+            'birthday'   => $birthday,
         ]);
     }
 
-    public function getFriendsUrl()
+    public function getFriendsUrl(): string
     {
-        throw new Exception("Not implemented");
+        return '';
     }
 
-    public function getFriends()
+    public function getFriends(): array
     {
-        throw new Exception("Not implemented");
+        return [];
     }
 
-    private function removeSizeParam(string $url)
+    private function removeSizeParam(string $url): string
     {
-        $uri = \Zend\Uri\UriFactory::factory($url);
+        $uri = UriFactory::factory($url);
 
-        if ($uri instanceof \Zend\Uri\Http) {
+        if ($uri instanceof Http) {
             $params = $uri->getQueryAsArray();
             unset($params['sz']);
             $uri->setQuery($params);

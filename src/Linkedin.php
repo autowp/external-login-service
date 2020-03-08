@@ -1,40 +1,38 @@
 <?php
 
-namespace Autowp\ExternalLoginService;
+declare(strict_types=1);
 
-use Autowp\ExternalLoginService\Exception;
-use Autowp\ExternalLoginService\LeagueOAuth2;
-use Autowp\ExternalLoginService\Result;
+namespace Autowp\ExternalLoginService;
 
 use League\OAuth2\Client\Provider\LinkedIn as LinkedInProvider;
 
-class Linkedin extends LeagueOAuth2
+use function trim;
+
+class Linkedin extends AbstractLeagueOAuth2
 {
-    protected function createProvider()
+    protected function createProvider(): LinkedInProvider
     {
         return new LinkedInProvider([
             'clientId'     => $this->options['clientId'],
             'clientSecret' => $this->options['clientSecret'],
-            'redirectUri'  => $this->options['redirectUri']
+            'redirectUri'  => $this->options['redirectUri'],
         ]);
     }
 
-    protected function getAuthorizationUrl()
+    protected function getAuthorizationUrl(): string
     {
         return $this->getProvider()->getAuthorizationUrl();
     }
 
-    protected function getFriendsAuthorizationUrl()
+    protected function getFriendsAuthorizationUrl(): string
     {
-        throw new Exception("Not implemented");
+        return '';
     }
 
     /**
-     * @return Result
-     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getData(array $options)
+    public function getData(array $options): Result
     {
         $provider = $this->getProvider();
 
@@ -44,17 +42,17 @@ class Linkedin extends LeagueOAuth2
             'externalId' => $ownerDetails->getId(),
             'name'       => trim($ownerDetails->getFirstname() . ' ' . $ownerDetails->getLastname()),
             'profileUrl' => $ownerDetails->getUrl(),
-            'photoUrl'   => $ownerDetails->getImageurl()
+            'photoUrl'   => $ownerDetails->getImageurl(),
         ]);
     }
 
-    public function getFriendsUrl()
+    public function getFriendsUrl(): string
     {
-        throw new Exception("Not implemented");
+        return '';
     }
 
-    public function getFriends()
+    public function getFriends(): array
     {
-        throw new Exception("Not implemented");
+        return [];
     }
 }

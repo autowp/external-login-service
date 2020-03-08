@@ -9,13 +9,12 @@
             "homepage": "http://pereslegin.ru"
         }
     ],
-    "minimum-stability": "beta",
     "require": {
-        "php": "^7.2.0",
+        "php": "^7.4",
         "ext-intl": "*",
         "ext-json": "*",
-        "zendframework/zend-session": "*",
-        "zendframework/zend-uri": "^2.6",
+        "laminas/laminas-session": "*",
+        "laminas/laminas-uri": "^2.6",
         "league/oauth1-client": "*",
         "league/oauth2-client": "^2.2",
         "league/oauth2-facebook": "^2.0",
@@ -23,18 +22,17 @@
         "league/oauth2-google": "^2.0",
         "league/oauth2-instagram": "^2.0",
         "league/oauth2-linkedin": "^2.0",
-        "zendframework/zend-validator": ">=2.6",
-        "zendframework/zend-json": ">=2.6",
+        "laminas/laminas-validator": ">=2.6",
+        "laminas/laminas-json": ">=2.6",
         "j4k/oauth2-vkontakte": ">=1.1.2",
-        "zendframework/zend-servicemanager": "^3.3",
+        "laminas/laminas-servicemanager": "^3.3",
 		"google/apiclient": "^2.2"
     },
     "require-dev": {
-        "satooshi/php-coveralls": "^1.0",
-        "codeclimate/php-test-reporter": "^0.4.0",
-        "zendframework/zend-coding-standard": "~1.0.0",
-        "phpmd/phpmd": "^2.6",
-        "zendframework/zend-test": "^3.2"
+        "php-coveralls/php-coveralls": "^2.0",
+        "laminas/laminas-coding-standard": "^2.0.0rc1",
+        "phpmd/phpmd": "^2.8",
+        "laminas/laminas-test": "^3.2"
     },
     "autoload": {
         "psr-4": {

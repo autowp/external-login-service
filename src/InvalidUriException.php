@@ -1,10 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\ExternalLoginService;
 
-use Autowp\ExternalLoginService\Exception;
-
-class InvalidUriException extends Exception
+class InvalidUriException extends ExternalLoginServiceException
 {
-
 }

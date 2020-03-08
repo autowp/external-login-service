@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\ExternalLoginService;
 
 class Module
@@ -7,7 +9,7 @@ class Module
     /**
      * Return default zend-validator configuration for zend-mvc applications.
      */
-    public function getConfig()
+    public function getConfig(): array
     {
         $provider = new ConfigProvider();
 

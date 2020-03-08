@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Autowp\ExternalLoginService;
 
-class InvalidEmailAddressException extends ExternalLoginServiceException
+use Exception;
+
+class ExternalLoginServiceException extends Exception
 {
 }

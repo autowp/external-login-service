@@ -1,51 +1,41 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\ExternalLoginService;
 
-use Autowp\ExternalLoginService\Exception;
-use Autowp\ExternalLoginService\AbstractService;
-use Autowp\ExternalLoginService\Result;
-
 use Google_Client;
-use GuzzleHttp\Exception\BadResponseException;
+use Laminas\Uri\Http;
+use Laminas\Uri\UriFactory;
+
+use function preg_split;
 
 class Google extends AbstractService
 {
-    /**
-     * @var string
-     */
-    private $idToken;
+    /** @var string */
+    private string $idToken;
 
-    public function getState()
+    public function getState(): string
     {
         return '';
     }
 
-    /**
-     * @return string
-     */
-    public function getLoginUrl()
+    public function getLoginUrl(): string
     {
         return '';
     }
 
-    /**
-     * @return string
-     */
-    public function getFriendsUrl()
+    public function getFriendsUrl(): string
     {
         return '';
     }
 
-    /**
-     * @param array $params
-     */
-    public function callback(array $params)
+    public function callback(array $params): array
     {
         return [];
     }
 
-    public function setIDToken(string $idToken)
+    public function setIDToken(string $idToken): self
     {
         $this->idToken = $idToken;
 
@@ -53,11 +43,9 @@ class Google extends AbstractService
     }
 
     /**
-     * @return Result
-     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getData(array $options)
+    public function getData(array $options): Result
     {
         $clientIDs = preg_split("/[[:space:]]+/isu", $this->options['clientId']);
 
@@ -67,7 +55,7 @@ class Google extends AbstractService
             }
 
             $client = new Google_Client([
-                'client_id' => $clientID
+                'client_id' => $clientID,
             ]);
 
             $payload = $client->verifyIdToken($this->idToken);
@@ -77,7 +65,7 @@ class Google extends AbstractService
         }
 
         if (! $payload) {
-            throw new Exception("idToken verification failed");
+            throw new ExternalLoginServiceException("idToken verification failed");
         }
 
         $photoUrl = $payload['picture'];
@@ -92,21 +80,21 @@ class Google extends AbstractService
             'photoUrl'   => $photoUrl,
             'location'   => '',
             'language'   => $payload['locale'],
-            'email'      => $payload['email']
+            'email'      => $payload['email'],
         ]);
     }
 
-    public function getFriends()
+    public function getFriends(): array
     {
         return [];
     }
 
-    private function setSizeParam(string $url, int $size)
+    private function setSizeParam(string $url, int $size): string
     {
-        $uri = \Zend\Uri\UriFactory::factory($url);
+        $uri = UriFactory::factory($url);
 
-        if ($uri instanceof \Zend\Uri\Http) {
-            $params = $uri->getQueryAsArray();
+        if ($uri instanceof Http) {
+            $params       = $uri->getQueryAsArray();
             $params['sz'] = $size;
             $uri->setQuery($params);
 

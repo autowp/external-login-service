@@ -1,61 +1,57 @@
 <?php
 
-namespace Autowp\ExternalLoginService;
+declare(strict_types=1);
 
-use Autowp\ExternalLoginService\Exception;
-use Autowp\ExternalLoginService\LeagueOAuth2;
-use Autowp\ExternalLoginService\Result;
+namespace Autowp\ExternalLoginService;
 
 use League\OAuth2\Client\Provider\Github as GithubProvider;
 
-class Github extends LeagueOAuth2
+class Github extends AbstractLeagueOAuth2
 {
-    protected function createProvider()
+    protected function createProvider(): GithubProvider
     {
         return new GithubProvider([
             'clientId'     => $this->options['clientId'],
             'clientSecret' => $this->options['clientSecret'],
-            'redirectUri'  => $this->options['redirectUri']
+            'redirectUri'  => $this->options['redirectUri'],
         ]);
     }
 
-    protected function getAuthorizationUrl()
+    protected function getAuthorizationUrl(): string
     {
         return $this->getProvider()->getAuthorizationUrl();
     }
 
-    protected function getFriendsAuthorizationUrl()
+    protected function getFriendsAuthorizationUrl(): string
     {
-        throw new Exception("Not implemented");
+        return '';
     }
 
     /**
-     * @return Result
-     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function getData(array $options)
+    public function getData(array $options): Result
     {
         $provider = $this->getProvider();
 
         $ownerDetails = $provider->getResourceOwner($this->accessToken);
-        $data = $ownerDetails->toArray();
+        $data         = $ownerDetails->toArray();
 
         return new Result([
             'externalId' => $data['id'],
             'name'       => $data['name'],
             'profileUrl' => $data['html_url'],
-            'photoUrl'   => $data['avatar_url']
+            'photoUrl'   => $data['avatar_url'],
         ]);
     }
 
-    public function getFriendsUrl()
+    public function getFriendsUrl(): string
     {
-        throw new Exception("Not implemented");
+        return '';
     }
 
-    public function getFriends()
+    public function getFriends(): array
     {
-        throw new Exception("Not implemented");
+        return [];
     }
 }

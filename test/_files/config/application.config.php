@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 return [
-    'modules' => [
+    'modules'                 => [
         'Zend\Router',
-        'Autowp\ExternalLoginService'
+        'Autowp\ExternalLoginService',
     ],
     'module_listener_options' => [
-        'module_paths' => [
+        'module_paths'      => [
             './vendor',
         ],
         'config_glob_paths' => [
             'test/_files/config/autoload/local.php',
         ],
-    ]
+    ],
 ];

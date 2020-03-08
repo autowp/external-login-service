@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AutowpTest\ExternalLoginService;
 
-use J4k\OAuth2\Client\Provider\VkontakteUser;
-use League\OAuth2\Client;
-use Zend\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
-
-use Autowp\ExternalLoginService\Vk;
 use Autowp\ExternalLoginService\PluginManager;
 use Autowp\ExternalLoginService\Result;
+use Autowp\ExternalLoginService\Vk;
+use Exception;
+use J4k\OAuth2\Client\Provider\VkontakteUser;
+use Laminas\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
+use League\OAuth2\Client;
 
 class VkTest extends AbstractHttpControllerTestCase
 {
@@ -17,7 +19,7 @@ class VkTest extends AbstractHttpControllerTestCase
     protected function setUp(): void
     {
         if (! $this->appConfigPath) {
-            throw new \Exception("Application config path not provided");
+            throw new Exception("Application config path not provided");
         }
 
         $this->setApplicationConfig(include $this->appConfigPath);
@@ -25,9 +27,9 @@ class VkTest extends AbstractHttpControllerTestCase
         parent::setUp();
     }
 
-    private function mockProvider()
+    private function mockProvider(): void
     {
-        $providerMock = $this->getMockBuilder(\League\OAuth2\Client\Provider\Google::class)
+        $providerMock = $this->getMockBuilder(Client::class)
             ->setMethods(['getResourceOwner', 'getAccessToken'])
             ->setConstructorArgs([[]])
             ->getMock();
@@ -38,13 +40,13 @@ class VkTest extends AbstractHttpControllerTestCase
                 'first_name'     => 'User',
                 'last_name'      => 'Name',
                 'screen_name'    => 'user_id',
-                'photo_max_orig' => 'http://example.com/user_id.jpg'
+                'photo_max_orig' => 'http://example.com/user_id.jpg',
             ]);
         });
 
         $providerMock->method('getAccessToken')->willReturnCallback(function () {
             return new Client\Token\AccessToken([
-                'access_token'  => 'returned_access_token'
+                'access_token' => 'returned_access_token',
             ]);
         });
 
@@ -53,10 +55,7 @@ class VkTest extends AbstractHttpControllerTestCase
         $service->setProvider($providerMock);
     }
 
-    /**
-     * @return Vk
-     */
-    private function getService()
+    private function getService(): Vk
     {
         $manager = $this->getApplicationServiceLocator()->get('ExternalLoginServiceManager');
 
@@ -69,31 +68,31 @@ class VkTest extends AbstractHttpControllerTestCase
         return $service;
     }
 
-    public function testUrl()
+    public function testUrl(): void
     {
         $service = $this->getService();
 
         $url = $service->getLoginUrl();
 
         $this->assertRegExp(
-            '|^https://oauth\.vk\.com/authorize' .
-                '\?state=[a-z0-9]+&scope=status&response_type=code' .
-                '&approval_prompt=auto&redirect_uri=http%3A%2F%2Fexample.com%2Fcallback' .
-                '&client_id=xxxx$|iu',
+            '|^https://oauth\.vk\.com/authorize'
+                . '\?state=[a-z0-9]+&scope=status&response_type=code'
+                . '&approval_prompt=auto&redirect_uri=http%3A%2F%2Fexample.com%2Fcallback'
+                . '&client_id=xxxx$|iu',
             $url
         );
     }
 
-    public function testFriendsUrl()
+    public function testFriendsUrl(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
 
         $service = $this->getService();
 
         $service->getFriendsUrl();
     }
 
-    public function testThrowsCredentialRequired()
+    public function testThrowsCredentialRequired(): void
     {
         $this->expectException(Client\Provider\Exception\IdentityProviderException::class);
 
@@ -103,7 +102,7 @@ class VkTest extends AbstractHttpControllerTestCase
         $service->getData([]);
     }
 
-    public function testGetData()
+    public function testGetData(): void
     {
         $this->mockProvider();
 
@@ -120,14 +119,14 @@ class VkTest extends AbstractHttpControllerTestCase
         $this->assertEquals('http://example.com/user_id.jpg', $data->getPhotoUrl());
     }
 
-    public function testCallback()
+    public function testCallback(): void
     {
         $this->mockProvider();
 
         $service = $this->getService();
 
         $accessToken = $service->callback([
-            'code' => 'zzzz'
+            'code' => 'zzzz',
         ]);
 
         $this->assertEquals('returned_access_token', $accessToken);

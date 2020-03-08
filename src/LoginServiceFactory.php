@@ -1,19 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\ExternalLoginService;
 
 use Exception;
-
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Config;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
+
+use function array_replace;
+use function is_array;
 
 class LoginServiceFactory implements FactoryInterface
 {
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param string $name
+     * @throws Exception
      */
-    public function __invoke(ContainerInterface $container, $name, array $options = null)
+    public function __invoke(ContainerInterface $container, $name, ?array $options = null): AbstractService
     {
         $config = $container->get('config');
         if (! isset($config['external_login_services'][$name])) {

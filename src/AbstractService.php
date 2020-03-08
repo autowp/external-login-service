@@ -1,43 +1,28 @@
 <?php
 
-namespace Autowp\ExternalLoginService;
+declare(strict_types=1);
 
-use Autowp\ExternalLoginService\Result;
+namespace Autowp\ExternalLoginService;
 
 abstract class AbstractService
 {
-    /**
-     * @var array
-     */
-    protected $options;
+    /** @var array */
+    protected array $options;
+
+    abstract public function getState(): string;
+
+    abstract public function getLoginUrl(): string;
+
+    abstract public function getFriendsUrl(): string;
 
     /**
-     * @return string
-     */
-    abstract public function getState();
-
-    abstract public function getLoginUrl();
-
-    /**
-     * @return string
-     */
-    abstract public function getFriendsUrl();
-
-    /**
-     * @param array $params
-     * @return bool
+     * @return mixed
      */
     abstract public function callback(array $params);
 
-    /**
-     * @return Result
-     */
-    abstract public function getData(array $options);
+    abstract public function getData(array $options): Result;
 
-    /**
-     * @return string
-     */
-    abstract public function getFriends();
+    abstract public function getFriends(): array;
 
     public function __construct(array $options)
     {

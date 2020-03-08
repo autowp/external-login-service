@@ -1,18 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Autowp\ExternalLoginService;
 
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class PluginManagerFactory implements FactoryInterface
 {
     /**
-     * {@inheritDoc}
-     *
-     * @return ValidatorPluginManager
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param string $name
      */
-    public function __invoke(ContainerInterface $container, $name, array $options = null)
+    public function __invoke(ContainerInterface $container, $name, ?array $options = null): PluginManager
     {
         $pluginManager = new PluginManager($container, $options ?: []);
 

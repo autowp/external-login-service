@@ -1,20 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace AutowpTest\ExternalLoginService;
 
-use DateTime;
-
-use PHPUnit\Framework\TestCase;
-
 use Autowp\ExternalLoginService\Result;
+use DateTime;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @group Autowp_ExternalLoginService
  */
 class ResultTest extends TestCase
 {
-
-    public function testBasicCorect()
+    public function testBasicCorect(): void
     {
         $data = [
             'externalId' => '123',
@@ -25,7 +24,7 @@ class ResultTest extends TestCase
             'birthday'   => new DateTime(),
             'location'   => null,
             'gender'     => null,
-            'language'   => null
+            'language'   => null,
         ];
 
         $result = new Result($data);
@@ -33,10 +32,7 @@ class ResultTest extends TestCase
         $this->assertEquals($data, $result->toArray());
     }
 
-    /**
-     * @expectedException \Autowp\ExternalLoginService\InvalidUriException
-     */
-    public function testIncorrectPhotoUriThrowsException()
+    public function testIncorrectPhotoUriThrowsException(): void
     {
         new Result([
             'externalId' => '123',
@@ -47,14 +43,11 @@ class ResultTest extends TestCase
             'birthday'   => null,
             'location'   => null,
             'gender'     => null,
-            'language'   => null
+            'language'   => null,
         ]);
     }
 
-    /**
-     * @expectedException \Autowp\ExternalLoginService\InvalidEmailAddressException
-     */
-    public function testIncorrectEmailThrowsException()
+    public function testIncorrectEmailThrowsException(): void
     {
         new Result([
             'externalId' => '123',
@@ -65,7 +58,7 @@ class ResultTest extends TestCase
             'birthday'   => null,
             'location'   => null,
             'gender'     => null,
-            'language'   => null
+            'language'   => null,
         ]);
     }
 }
