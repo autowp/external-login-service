@@ -28,7 +28,7 @@ class GooglePlusTest extends AbstractHttpControllerTestCase
 
     private function mockProvider(): void
     {
-        $providerMock = $this->getMockBuilder(GooglePlus::class)
+        $providerMock = $this->getMockBuilder(Client\Provider\Google::class)
             ->setMethods(['getResourceOwner', 'getAccessToken'])
             ->setConstructorArgs([[]])
             ->getMock();

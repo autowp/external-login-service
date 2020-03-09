@@ -28,7 +28,7 @@ class LinkedInTest extends AbstractHttpControllerTestCase
 
     private function mockProvider(): void
     {
-        $providerMock = $this->getMockBuilder(Linkedin::class)
+        $providerMock = $this->getMockBuilder(Client\Provider\Linkedin::class)
             ->setMethods(['getResourceOwner', 'getAccessToken'])
             ->setConstructorArgs([[]])
             ->getMock();

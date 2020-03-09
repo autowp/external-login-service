@@ -31,7 +31,7 @@ class GithubTest extends AbstractHttpControllerTestCase
 
     private function mockProvider(): void
     {
-        $providerMock = $this->getMockBuilder(Github::class)
+        $providerMock = $this->getMockBuilder(Client\Provider\Github::class)
             ->onlyMethods(['getResourceOwner', 'getAccessToken'])
             ->setConstructorArgs([[]])
             ->getMock();

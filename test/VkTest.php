@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AutowpTest\ExternalLoginService;
 
 use Autowp\ExternalLoginService\PluginManager;
+use Autowp\ExternalLoginService\Provider\VkProvider;
 use Autowp\ExternalLoginService\Result;
 use Autowp\ExternalLoginService\Vk;
 use Exception;
@@ -29,7 +30,7 @@ class VkTest extends AbstractHttpControllerTestCase
 
     private function mockProvider(): void
     {
-        $providerMock = $this->getMockBuilder(Vk::class)
+        $providerMock = $this->getMockBuilder(VkProvider::class)
             ->setMethods(['getResourceOwner', 'getAccessToken'])
             ->setConstructorArgs([[]])
             ->getMock();
