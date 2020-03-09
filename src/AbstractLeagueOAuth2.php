@@ -12,8 +12,7 @@ use League\OAuth2\Client\Token\AccessTokenInterface;
 
 abstract class AbstractLeagueOAuth2 extends AbstractService
 {
-    /** @var AbstractProvider */
-    protected AbstractProvider $provider;
+    protected ?AbstractProvider $provider;
 
     protected AccessTokenInterface $accessToken;
 
@@ -21,7 +20,7 @@ abstract class AbstractLeagueOAuth2 extends AbstractService
 
     protected function getProvider(): AbstractProvider
     {
-        if (! $this->provider) {
+        if (! isset($this->provider)) {
             $this->provider = $this->createProvider();
         }
 

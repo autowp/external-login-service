@@ -89,14 +89,9 @@ class Result
         return $this->name;
     }
 
-    /**
-     * @param string $profileUrl
-     */
-    public function setProfileUrl($profileUrl): self
+    public function setProfileUrl(?string $profileUrl): self
     {
         $this->profileUrl = null;
-
-        $profileUrl = (string) $profileUrl;
 
         if ($profileUrl) {
             $this->profileUrl = $profileUrl;
@@ -117,13 +112,11 @@ class Result
     }
 
     /**
-     * @param string $photoUrl
+     * @throws InvalidUriException
      */
-    public function setPhotoUrl($photoUrl): self
+    public function setPhotoUrl(?string $photoUrl): self
     {
         $this->photoUrl = null;
-
-        $photoUrl = (string) $photoUrl;
 
         if ($photoUrl) {
             $validator = new Uri([
@@ -145,20 +138,15 @@ class Result
         return $this->photoUrl;
     }
 
-    /**
-     * @param string $email
-     */
-    public function setEmail($email): self
+    public function setEmail(?string $email): self
     {
         $this->email = null;
-
-        $email = (string) $email;
 
         if ($email) {
             $validator = new EmailAddress();
 
             if (! $validator->isValid($email)) {
-                throw new InvalidEmailAddressExternalLoginServiceException("Invalid e-mail `$email`");
+                throw new InvalidEmailAddressException("Invalid e-mail `$email`");
             }
 
             $this->email = $email;
@@ -184,7 +172,7 @@ class Result
         return $this->birthday;
     }
 
-    public function setGender(string $gender): self
+    public function setGender(?string $gender): self
     {
         $this->gender = $gender;
 
