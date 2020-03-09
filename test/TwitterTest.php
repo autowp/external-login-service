@@ -15,6 +15,9 @@ class TwitterTest extends AbstractHttpControllerTestCase
 {
     protected string $appConfigPath = __DIR__ . '/_files/config/application.config.php';
 
+    /**
+     * @throws Exception
+     */
     protected function setUp(): void
     {
         if (! $this->appConfigPath) {
@@ -29,7 +32,7 @@ class TwitterTest extends AbstractHttpControllerTestCase
     private function mockProvider(): void
     {
         $serverMock = $this->getMockBuilder(Client\Server\Twitter::class)
-            ->setMethods(['getUserDetails', 'getTemporaryCredentials', 'getTokenCredentials'])
+            ->onlyMethods(['getUserDetails', 'getTemporaryCredentials', 'getTokenCredentials'])
             ->setConstructorArgs([
                 [
                     'identifier'   => 'xxxx',
@@ -114,21 +117,6 @@ class TwitterTest extends AbstractHttpControllerTestCase
                 . '\?oauth_token=temporary_identifier$|iu',
             $url
         );
-    }
-
-    public function testThrowsCredentialRequired(): void
-    {
-        $this->expectException(Exception::class);
-
-        $service = $this->getService();
-
-        $accessToken = new Client\Credentials\TokenCredentials();
-        $accessToken->setIdentifier('identifier');
-        $accessToken->setSecret('secret');
-
-        $service->setAccessToken($accessToken);
-
-        $service->getData([]);
     }
 
     public function testGetData(): void

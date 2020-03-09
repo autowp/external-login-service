@@ -16,6 +16,9 @@ class FacebookTest extends AbstractHttpControllerTestCase
 {
     protected string $appConfigPath = __DIR__ . '/_files/config/application.config.php';
 
+    /**
+     * @throws Exception
+     */
     protected function setUp(): void
     {
         if (! $this->appConfigPath) {
@@ -30,7 +33,7 @@ class FacebookTest extends AbstractHttpControllerTestCase
     private function mockProvider(): void
     {
         $providerMock = $this->getMockBuilder(FacebookProvider::class)
-            ->setMethods(['getResourceOwner', 'getAccessToken'])
+            ->onlyMethods(['getResourceOwner', 'getAccessToken'])
             ->setConstructorArgs([
                 [
                     'graphApiVersion' => 'v2.10',
@@ -98,16 +101,6 @@ class FacebookTest extends AbstractHttpControllerTestCase
                 . '&redirect_uri=http%3A%2F%2Fexample.com%2Fcallback&client_id=xxxx$|iu',
             $url
         );
-    }
-
-    public function testThrowsCredentialRequired(): void
-    {
-        $this->expectException(Client\Provider\Exception\IdentityProviderException::class);
-
-        $service = $this->getService();
-
-        $service->setAccessToken('example_access_token');
-        $service->getData([]);
     }
 
     public function testGetData(): void

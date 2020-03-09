@@ -31,6 +31,7 @@ class Linkedin extends AbstractLeagueOAuth2
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @throws ExternalLoginServiceException
      */
     public function getData(array $options): Result
     {

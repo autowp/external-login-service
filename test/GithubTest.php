@@ -85,21 +85,7 @@ class GithubTest extends AbstractHttpControllerTestCase
 
     public function testFriendsUrl(): void
     {
-        $this->expectException(Exception::class);
-
-        $service = $this->getService();
-
-        $service->getFriendsUrl();
-    }
-
-    public function testThrowsCredentialRequired(): void
-    {
-        $this->expectException(Client\Provider\Exception\GithubIdentityProviderException::class);
-
-        $service = $this->getService();
-
-        $service->setAccessToken('example_access_token');
-        $service->getData([]);
+        $this->assertEquals('', $this->getService()->getFriendsUrl());
     }
 
     public function testGetData(): void

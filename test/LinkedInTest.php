@@ -15,6 +15,9 @@ class LinkedInTest extends AbstractHttpControllerTestCase
 {
     protected string $appConfigPath = __DIR__ . '/_files/config/application.config.php';
 
+    /**
+     * @throws Exception
+     */
     protected function setUp(): void
     {
         if (! $this->appConfigPath) {
@@ -28,8 +31,8 @@ class LinkedInTest extends AbstractHttpControllerTestCase
 
     private function mockProvider(): void
     {
-        $providerMock = $this->getMockBuilder(Client\Provider\Linkedin::class)
-            ->setMethods(['getResourceOwner', 'getAccessToken'])
+        $providerMock = $this->getMockBuilder(Client\Provider\LinkedIn::class)
+            ->onlyMethods(['getResourceOwner', 'getAccessToken'])
             ->setConstructorArgs([[]])
             ->getMock();
 
@@ -83,21 +86,7 @@ class LinkedInTest extends AbstractHttpControllerTestCase
 
     public function testFriendsUrl(): void
     {
-        $this->expectException(Exception::class);
-
-        $service = $this->getService();
-
-        $service->getFriendsUrl();
-    }
-
-    public function testThrowsCredentialRequired(): void
-    {
-        //$this->expectException(Client\Provider\Exception\IdentityProviderException::class);
-
-        $service = $this->getService();
-
-        $service->setAccessToken('example_access_token');
-        $service->getData([]);
+        $this->assertEquals('', $this->getService()->getFriendsUrl());
     }
 
     public function testGetData(): void

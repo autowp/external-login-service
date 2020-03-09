@@ -8,13 +8,12 @@ use InvalidArgumentException;
 use League\OAuth2\Client\Provider\AbstractProvider;
 use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
 use League\OAuth2\Client\Token\AccessToken;
-use League\OAuth2\Client\Token\AccessTokenInterface;
 
 abstract class AbstractLeagueOAuth2 extends AbstractService
 {
     protected ?AbstractProvider $provider;
 
-    protected AccessTokenInterface $accessToken;
+    protected AccessToken $accessToken;
 
     abstract protected function createProvider(): AbstractProvider;
 
@@ -54,7 +53,7 @@ abstract class AbstractLeagueOAuth2 extends AbstractService
     /**
      * @throws IdentityProviderException
      */
-    public function callback(array $params): AccessTokenInterface
+    public function callback(array $params): AccessToken
     {
         if (! isset($params['code'])) {
             throw new InvalidArgumentException("`code` not provided");
