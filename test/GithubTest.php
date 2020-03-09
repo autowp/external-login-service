@@ -13,8 +13,11 @@ use League\OAuth2\Client;
 
 class GithubTest extends AbstractHttpControllerTestCase
 {
-    protected $appConfigPath = __DIR__ . '/_files/config/application.config.php';
+    protected string $appConfigPath = __DIR__ . '/_files/config/application.config.php';
 
+    /**
+     * @throws Exception
+     */
     protected function setUp(): void
     {
         if (! $this->appConfigPath) {
@@ -28,8 +31,8 @@ class GithubTest extends AbstractHttpControllerTestCase
 
     private function mockProvider(): void
     {
-        $providerMock = $this->getMockBuilder(Client::class)
-            ->setMethods(['getResourceOwner', 'getAccessToken'])
+        $providerMock = $this->getMockBuilder(Github::class)
+            ->onlyMethods(['getResourceOwner', 'getAccessToken'])
             ->setConstructorArgs([[]])
             ->getMock();
 

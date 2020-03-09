@@ -32,13 +32,10 @@ class Twitter extends AbstractService
 
     public function getSession(): Container
     {
-        return $this->session ? $this->session : $this->session = new Container('Twitter');
+        return $this->session ?? $this->session = new Container('Twitter');
     }
 
-    /**
-     * @return Client\Server\Twitter
-     */
-    public function getServer()
+    public function getServer(): Client\Server\Twitter
     {
         if (! $this->server) {
             $serverOptions = [
@@ -55,7 +52,7 @@ class Twitter extends AbstractService
         return $this->server;
     }
 
-    public function setServer(Client\Server\Twitter $server)
+    public function setServer(Client\Server\Twitter $server): void
     {
         $this->server = $server;
     }
@@ -93,6 +90,9 @@ class Twitter extends AbstractService
         return $this->getServer()->getAuthorizationUrl($temporaryCredentials);
     }
 
+    /**
+     * @throws ExternalLoginServiceException
+     */
     public function callback(array $params): ?TokenCredentials
     {
         if (isset($params['denied']) && $params['denied']) {

@@ -14,7 +14,7 @@ use League\OAuth2\Client;
 
 class FacebookTest extends AbstractHttpControllerTestCase
 {
-    protected $appConfigPath = __DIR__ . '/_files/config/application.config.php';
+    protected string $appConfigPath = __DIR__ . '/_files/config/application.config.php';
 
     protected function setUp(): void
     {

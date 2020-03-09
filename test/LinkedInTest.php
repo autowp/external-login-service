@@ -13,7 +13,7 @@ use League\OAuth2\Client;
 
 class LinkedInTest extends AbstractHttpControllerTestCase
 {
-    protected $appConfigPath = __DIR__ . '/_files/config/application.config.php';
+    protected string $appConfigPath = __DIR__ . '/_files/config/application.config.php';
 
     protected function setUp(): void
     {
@@ -28,7 +28,7 @@ class LinkedInTest extends AbstractHttpControllerTestCase
 
     private function mockProvider(): void
     {
-        $providerMock = $this->getMockBuilder(Client::class)
+        $providerMock = $this->getMockBuilder(Linkedin::class)
             ->setMethods(['getResourceOwner', 'getAccessToken'])
             ->setConstructorArgs([[]])
             ->getMock();

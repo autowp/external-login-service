@@ -13,7 +13,7 @@ use League\OAuth1\Client;
 
 class TwitterTest extends AbstractHttpControllerTestCase
 {
-    protected $appConfigPath = __DIR__ . '/_files/config/application.config.php';
+    protected string $appConfigPath = __DIR__ . '/_files/config/application.config.php';
 
     protected function setUp(): void
     {

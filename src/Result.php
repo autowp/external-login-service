@@ -138,6 +138,9 @@ class Result
         return $this->photoUrl;
     }
 
+    /**
+     * @throws InvalidEmailAddressException
+     */
     public function setEmail(?string $email): self
     {
         $this->email = null;
@@ -184,7 +187,7 @@ class Result
         return $this->gender;
     }
 
-    public function setLocation(string $location): self
+    public function setLocation(?string $location): self
     {
         $this->location = $location;
 
@@ -196,7 +199,7 @@ class Result
         return $this->location;
     }
 
-    public function setLanguage(string $language): self
+    public function setLanguage(?string $language): self
     {
         $this->language = $language;
 
@@ -218,6 +221,9 @@ class Result
         ];
     }
 
+    /**
+     * @throws ExternalLoginServiceException
+     */
     public static function fromArray(array $options): self
     {
         return new self($options);

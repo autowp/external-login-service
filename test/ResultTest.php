@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AutowpTest\ExternalLoginService;
 
+use Autowp\ExternalLoginService\ExternalLoginServiceException;
 use Autowp\ExternalLoginService\Result;
 use DateTime;
 use PHPUnit\Framework\TestCase;
@@ -13,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  */
 class ResultTest extends TestCase
 {
-    public function testBasicCorect(): void
+    public function testBasicCorrect(): void
     {
         $data = [
             'externalId' => '123',
@@ -34,6 +35,7 @@ class ResultTest extends TestCase
 
     public function testIncorrectPhotoUriThrowsException(): void
     {
+        $this->expectException(ExternalLoginServiceException::class);
         new Result([
             'externalId' => '123',
             'name'       => 'Ivanov Ivan',
@@ -49,6 +51,7 @@ class ResultTest extends TestCase
 
     public function testIncorrectEmailThrowsException(): void
     {
+        $this->expectException(ExternalLoginServiceException::class);
         new Result([
             'externalId' => '123',
             'name'       => 'Ivanov Ivan',

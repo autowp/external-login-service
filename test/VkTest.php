@@ -14,7 +14,7 @@ use League\OAuth2\Client;
 
 class VkTest extends AbstractHttpControllerTestCase
 {
-    protected $appConfigPath = __DIR__ . '/_files/config/application.config.php';
+    protected string $appConfigPath = __DIR__ . '/_files/config/application.config.php';
 
     protected function setUp(): void
     {
@@ -29,7 +29,7 @@ class VkTest extends AbstractHttpControllerTestCase
 
     private function mockProvider(): void
     {
-        $providerMock = $this->getMockBuilder(Client::class)
+        $providerMock = $this->getMockBuilder(Vk::class)
             ->setMethods(['getResourceOwner', 'getAccessToken'])
             ->setConstructorArgs([[]])
             ->getMock();
