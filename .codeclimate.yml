@@ -10,9 +10,6 @@ engines:
     enabled: true
   phpmd:
     enabled: true
-    checks
-      CleanCode/StaticAccess:
-        enabled: false
   phpcodesniffer:
     enabled: true
   phan:
