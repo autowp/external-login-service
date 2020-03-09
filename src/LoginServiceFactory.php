@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Autowp\ExternalLoginService;
 
-use Exception;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -16,13 +15,13 @@ class LoginServiceFactory implements FactoryInterface
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @param string $name
-     * @throws Exception
+     * @throws ExternalLoginServiceException
      */
     public function __invoke(ContainerInterface $container, $name, ?array $options = null): AbstractService
     {
         $config = $container->get('config');
         if (! isset($config['external_login_services'][$name])) {
-            throw new Exception("Config for `$name` not found");
+            throw new ExternalLoginServiceException("Config for `$name` not found");
         }
 
         $params = $config['external_login_services'][$name];
