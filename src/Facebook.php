@@ -47,9 +47,7 @@ class Facebook extends AbstractLeagueOAuth2
 
     protected function getFriendsAuthorizationUrl(): string
     {
-        return $this->getProvider()->getAuthorizationUrl([
-            'scope' => $this->getScope(),
-        ]);
+        return $this->getAuthorizationUrl();
     }
 
     /** @var string */
@@ -69,6 +67,7 @@ class Facebook extends AbstractLeagueOAuth2
 
     /**
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @throws ExternalLoginServiceException
      */
     public function getData(array $options): Result
     {
