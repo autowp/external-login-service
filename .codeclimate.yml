@@ -12,7 +12,7 @@ engines:
     enabled: true
     checks
       CleanCode/StaticAccess:
-        enabled: false:
+        enabled: false
   phpcodesniffer:
     enabled: true
   phan:
