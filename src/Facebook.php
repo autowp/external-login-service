@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Autowp\ExternalLoginService;
 
 use DateTime;
-use Laminas\Json\Json;
+use Laminas\Json;
 use Locale;
 
 use function count;
@@ -119,6 +119,9 @@ class Facebook extends AbstractLeagueOAuth2
         return new Result($data);
     }
 
+    /**
+     * @throws ExternalLoginServiceException
+     */
     public function getFriends(): array
     {
         if (! $this->accessToken) {
@@ -136,7 +139,7 @@ class Facebook extends AbstractLeagueOAuth2
         while (true) {
             $response = file_get_contents($url);
             try {
-                $response = Json::decode($response);
+                $response = Json\Json::decode($response);
             } catch (Json\Exception\RuntimeException $e) {
                 $response = null;
             }
